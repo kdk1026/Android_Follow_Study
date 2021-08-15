@@ -1,5 +1,6 @@
 Android 전화번호 및 고유ID 가져오기
 ----------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
 
 	* src/main/AndroidManifest.xml
 	-----------------------------------------------------------------

@@ -1,5 +1,6 @@
 Android 주소록, 전화
 --------------------
+    - minSdkVersion 26 / targetSdkVersion 30
 
     * app/build.gradle
     -----------------------------------------------------------------

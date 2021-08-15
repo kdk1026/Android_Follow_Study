@@ -1,5 +1,6 @@
 Android 오류 참고
 -----------------
+    - minSdkVersion 26 / targetSdkVersion 30
 
 ---------------------------------------------------------------------------
 - 안드로이드 ConstraintLayout 오류 - This view is not constrained.. 오류해결!

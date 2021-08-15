@@ -1,5 +1,6 @@
 Android 푸시 알림 설정
-────────────
+----------------------
+	- minSdkVersion 26 / targetSdkVersion 30
 
 -----------------------------
 1. (사전작업) Firebase Cloud Messaging
