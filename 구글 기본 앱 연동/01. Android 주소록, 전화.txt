@@ -1,0 +1,103 @@
+Android 주소록, 전화
+--------------------
+
+    * app/build.gradle
+    -----------------------------------------------------------------
+    // https://mvnrepository.com/artifact/androidx.activity/activity-ktx
+    implementation 'androidx.activity:activity-ktx:1.3.1'
+    -----------------------------------------------------------------
+
+	* src/main/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+	-----------------------------------------------------------------
+	
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnContacts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="주소록 연동"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnCallPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="전화 연동"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+	* src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.processContacts();
+        this.processCallPhone();
+    }
+
+    private void processContacts() {
+        Button btnContacts = findViewById(R.id.btnContacts);
+        btnContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setData(ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(intent, 10);
+
+                /*
+                    // https://bacassf.tistory.com/104
+                    
+                    // TODO : deprecated 되었건만... 어쩔 수가 없다... 아오!! 힘들게 찾았드만 에러가 아주!!!
+                 */
+//                ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
+//                    new  ActivityResultContracts.StartActivityForResult(),
+//                    new ActivityResultCallback<ActivityResult>() {
+//                        @Override
+//                        public void onActivityResult(ActivityResult result) {
+//                            Log.d(TAG, "MainActivity로 돌아왔다. ");
+//                        }
+//                });
+//                startActivityResult.launch(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ( requestCode==10 && resultCode==RESULT_OK ) {
+            String sResult = data.getDataString();
+            Log.d(TAG, "선택한 결과 : " + sResult);
+
+            // 상세보기 화면 띄우기
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(sResult));
+            startActivity(intent);
+        }
+    }
+
+    private void processCallPhone() {
+        Button btnCallPhone = findViewById(R.id.btnCallPhone);
+        btnCallPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                    전화 열기 : Intent.ACTION_DIAL
+                    전화 걸기 : Intent.ACTION_CALL
+                 */
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:01099243732"));
+                startActivity(intent);
+            }
+        });
+    }
+    -----------------------------------------------------------------
