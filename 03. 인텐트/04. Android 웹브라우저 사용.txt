@@ -1,0 +1,39 @@
+04. Android 웹브라우저 사용
+-------------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/btn01"
+            android:text="Go! 네이버"/>
+
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button button = findViewById(R.id.btn01);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("http://m.naver.com"));
+
+                startActivity(intent);
+            }
+        });
+    }
+	-----------------------------------------------------------------

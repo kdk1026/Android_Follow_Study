@@ -1,0 +1,76 @@
+Android AsyncHttpClient
+────────────
+
+* 라이브러리
+-------------
+	> http://www.mvnrepository.com/
+		>> android-async 검색
+		
+		===========================
+		Android Async Http Library
+		===========================
+		
+------------------------
+* AndroidMainfest.xml
+------------------------
+...
+    </application>
+
+    <!-- HTTP 접근 퍼미션 설정 -->
+    <uses-permission
+        android:name="android.permission.INTERNET">
+    </uses-permission>
+	
+-------------------------------
+* common.util.AsycHttpClientUtil
+-------------------------------
+public class AsycHttpClientUtil {
+
+    private static final String TAG = "AsycHttpClientUtil";
+
+    private static AsyncHttpClient ac;
+
+    public static void post(String url, RequestParams params, AsyncHttpResponseHandler handler) {
+        ac = new AsyncHttpClient();
+        ac.post(url, params, handler);
+        Log.i(TAG, "Http POST is\n\t [URL]-" + url + ",[Param]-" + params);
+    }
+}
+
+
+------------------------
+* Android TextView 참조
+------------------------
+
+------------------------
+* Async Http
+------------------------
+	- MainActivity.java
+	
+	========================================================================================================
+		String url = "";
+		RequestParams params = new RequestParams();
+		params.pu("a", "11");
+		...
+	
+        AsycHttpClientUtil.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody, "UTF-8");
+                    Log.i(TAG, "Response-" + response);
+
+                    TextView textView = (TextView) findViewById(R.id.textView);
+                    textView.setText(response);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
+	========================================================================================================

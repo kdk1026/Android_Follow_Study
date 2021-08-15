@@ -1,0 +1,84 @@
+07. Android Spinner
+-------------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+   <LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="30dp"
+				android:text="선택된 단어 : "/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="10dp"
+				android:textSize="30dp"
+				android:id="@+id/selText"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp">
+
+			<Spinner
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/spinner"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+	-----------------------------------------------------------------
+		
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private TextView selText;
+    private Spinner spinner;
+    private String[] items;
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        selText = findViewById(R.id.selText);
+        spinner = findViewById(R.id.spinner);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                selText.setText(items[i]);
+                if ( selText.getText().toString().equals("선택하세요") ) {
+                    selText.setText("");
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                selText.setText("");
+            }
+        });
+
+        items = new String[] {
+                "선택하세요", "한국", "일본", "중국", "미국"
+        };
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+    }
+	-----------------------------------------------------------------

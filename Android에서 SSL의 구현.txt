@@ -1,0 +1,18 @@
+Android에서 SSL의 구현
+
+https://developer.android.com/training/articles/security-ssl.html#CommonProblems
+
+공인된 CA를 사용하는 경우 HttpUrlConnection을 사용하면 내부적으로 자동 처리되나, 아래와 같은 경우 SSLHandShakeException을 일으킨다.
+
+1. Android system에서 알지 못하는 (unknown) 인증서인 경우
+- Android에서 인증된 인증서가 아니거나, SDK 버전이 구버전인 경우
+2. 서버에서 자체 서명한 인증서인 경우
+3. 중간 CA에 생략되어 Android에서 인식 못하는 경우
+
+인증서를 따로 생성해서 Client에서 등록하여 사용하는 방법
+
+1. 수신받은 inputStream에서 cert 파일 추출 및 certification 생성
+2. keyStore를 생성하여 certification set
+3. trustManager 생성하여 keyStore로 init
+4. SSLcontext를 생성하여 trustManager로 init
+5. HttpUrlConnection에 SSLSocketFactory에 생성된 context의 socketFactory를 set

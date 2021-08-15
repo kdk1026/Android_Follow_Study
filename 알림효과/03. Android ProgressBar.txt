@@ -1,0 +1,60 @@
+Android ProgressBar
+---------------------------
+
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <!-- style 종류 총 8개 -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="100"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:hint="입력 (ex: 0-100)"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ProgressBar 보여주기"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="150dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+	-----------------------------------------------------------------
+	
+	* src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.processProgressBar();
+    }
+
+    private void processProgressBar() {
+        Button btnProgressBar = findViewById(R.id.btnProgressBar);
+        btnProgressBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText editText = findViewById(R.id.editText);
+                int nValue = Integer.parseInt(editText.getText().toString());
+
+                ProgressBar progressBar = findViewById(R.id.progressBar);
+                progressBar.setProgress(nValue);
+            }
+        });
+    }
+	-----------------------------------------------------------------

@@ -1,0 +1,114 @@
+Android JSON
+────────
+
+-----------------------------------------------
+* Google Android Library 에 포함된 JSON 라이브러리
+-----------------------------------------------
+	=============
+	JSON In Java
+	=============
+	> http://www.mvnrepository.com/
+		>> json 검색
+		
+----------------------
+* Android TextView 참조
+----------------------
+
+-------------
+* JSONObject
+-------------
+	- MainActivity.java
+	=================================================================
+	...	
+		JSONObject jObj = new JSONObject();
+		try {
+			jObj.put("a", "11");
+			jObj.put("b", "22");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		String strJson = jObj.toString();
+		
+		TextView textView = (TextView)findViewById(R.id.textView);
+		textView.setText(strJson);
+	}
+	=================================================================
+	...
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.put("a", "11");
+		dataMap.put("b", "22");
+		String strJson = new JSONObject(dataMap).toString();
+			
+		TextView textView = (TextView)findViewById(R.id.textView);
+		textView.setText(strJson);
+	}	
+	=================================================================
+
+-------------
+* JSONArray
+-------------
+	- MainActivity.java
+	=================================================================
+	...
+        JSONArray jArray = new JSONArray();
+        JSONObject jObj = new JSONObject();
+        try {
+            jObj.put("a", "11");
+            jObj.put("b", "22");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        jArray.put(jObj);
+
+        jObj = new JSONObject();
+        try {
+            jObj.put("c", "33");
+            jObj.put("d", "44");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        jArray.put(jObj);
+
+        String strJson = jArray.toString();
+		
+		TextView textView = (TextView)findViewById(R.id.textView);
+		textView.setText(strJson);
+	}	
+	=================================================================
+	...
+		JSONArray jArray = new JSONArray();
+		
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.put("a", "11");
+		dataMap.put("b", "22");
+		jArray.put(dataMap);
+	
+		dataMap = new HashMap<String, Object>();
+		dataMap.put("c", "33");
+		dataMap.put("d", "44");
+		jArray.put(dataMap);
+		
+		String strJson = jArray.toString();
+		
+		TextView textView = (TextView)findViewById(R.id.textView);
+		textView.setText(strJson);
+	}	
+	=================================================================
+
+--------------------
+* JSON String to Map
+--------------------
+	=================================================================
+	public static void main(String[] args) {
+	
+		JSONObject jObj = new JSONObject(strJson);
+		
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		for (int i=0; i < jObj.length(); i++) {
+			String key = jObj.names().getString(i);
+			dataMap.put(key, jObj.get(key));
+		}
+		
+		 System.out.println(dataMap);
+	}
+	=================================================================

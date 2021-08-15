@@ -1,0 +1,175 @@
+04. Android Custom ListView
+-------------------------------------
+
+※ 참고 : http://bestcoding.tistory.com/9
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listView1" />
+
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /res 이미지 복사
+	-----------------------------------------------------------------
+		Custom ListView_drawable.zip
+	-----------------------------------------------------------------
+	
+	
+	* layout -> 우클릭 -> New -> XML -> Layout XML File
+		: custom_listview
+	
+	* /res/layout/custom_listview.xml
+	-----------------------------------------------------------------
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/txt_id"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/txt_name"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7"
+        android:textStyle="bold"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/img_up"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1"
+        android:gravity="center"
+        android:src="@drawable/ic_thumb_up_black_18dp"/>
+
+    <TextView
+        android:id="@+id/txt_like"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1"
+        android:gravity="center"/>	
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/vo/ListViewVO
+	-----------------------------------------------------------------
+	public class ListViewVO {
+		private String sName;
+		private int nId, nLike;
+		
+		Getter and Setter
+	}
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/adapter/ListViewAdapter
+	-----------------------------------------------------------------
+	public class ListViewAdapter extends BaseAdapter {
+
+		private List<ListViewVO> list;
+		private int nId;
+
+		public ListViewAdapter() {
+			list = new ArrayList<>();
+			nId = 0;
+		}
+
+		@Override
+		public int getCount() {
+			return list.size();
+		}
+
+		@Override
+		public Object getItem(int i) {
+			return list.get(i);
+		}
+
+		@Override
+		public long getItemId(int i) {
+			return i;
+		}
+
+		@Override
+		public View getView(int i, View view, ViewGroup viewGroup) {
+			final Context context = viewGroup.getContext();
+
+			ListViewVO listItem = list.get(i);
+			if (view == null) {
+				LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.custom_listview, viewGroup, false);
+			}
+
+			TextView id = view.findViewById(R.id.txt_id);
+			TextView name = view.findViewById(R.id.txt_name);
+			TextView like = view.findViewById(R.id.txt_like);
+
+			id.setText( String.valueOf(listItem.getnId()) );
+			name.setText( String.valueOf(listItem.getsName()) );
+			like.setText( String.valueOf(listItem.getnLike()) );
+
+			return view;
+		}
+
+		public void addItem(String name) {
+			ListViewVO vo = new ListViewVO();
+
+			vo.setnId(++nId);
+			vo.setsName(name);
+			vo.setnLike(0);
+
+			list.add(vo);
+		}
+	}
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private String[] lang = {
+            "C",
+            "Java",
+            "PHP",
+            "Swift"
+    };
+
+    private ListView listView;
+    private ListViewAdapter adapter;
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        adapter = new ListViewAdapter();
+
+        listView = findViewById(R.id.listView1);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ListViewVO vo = (ListViewVO) adapterView.getItemAtPosition(i);
+
+                int nLike = vo.getnLike();
+                vo.setnLike(++nLike);
+                adapter.notifyDataSetChanged();
+            }
+        });
+		
+        for (int i=0; i < lang.length; i++) {
+            adapter.addItem(lang[i]);
+            adapter.notifyDataSetChanged();
+        }
+    }
+	-----------------------------------------------------------------

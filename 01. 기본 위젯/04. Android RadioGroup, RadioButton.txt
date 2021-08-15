@@ -1,0 +1,65 @@
+04. Android RadioGroup, RadioButton
+------------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="성별" />
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioGroup1"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radio1"
+                android:text="남성" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radio2"
+                android:text="여성" />
+        </RadioGroup>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn1"
+            android:text="확인" />
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        final RadioGroup radioGroup1 = findViewById(R.id.radioGroup1);
+
+        Button btn1 = findViewById(R.id.btn1);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int id = radioGroup1.getCheckedRadioButtonId();
+
+                RadioButton radioButton1 = findViewById(id);
+
+                String msg = "결과 : " + radioButton1.getText().toString();
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+	-----------------------------------------------------------------

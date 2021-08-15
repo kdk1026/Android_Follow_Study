@@ -1,0 +1,39 @@
+06. Android AlertDialog
+-------------------------
+
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+        alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        alert.setMessage("테스트 메시지");
+        alert.show();
+
+        AlertDialog.Builder confirm = new AlertDialog.Builder(MainActivity.this);
+        confirm.setMessage("프로그램을 종료 하시겠습니까?");
+        confirm.setCancelable(false);
+        confirm.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(getApplicationContext(), "YES", Toast.LENGTH_SHORT).show();
+            }
+        });
+        confirm.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(getApplicationContext(), "NO", Toast.LENGTH_SHORT).show();
+            }
+        });
+        AlertDialog alert_confirm = confirm.create();
+        alert_confirm.show();
+    }
+	-----------------------------------------------------------------	

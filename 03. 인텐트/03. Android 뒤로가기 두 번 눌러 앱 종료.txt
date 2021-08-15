@@ -1,0 +1,43 @@
+03. Android 뒤로가기 두 번 눌러 앱 종료
+--------------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+		
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="뒤로가기 두 번 눌러 앱 종료"/>
+
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+	
+	// 메소드명 입력 시, 자동으로 오버라이딩
+    @Override
+    public void onBackPressed() {
+        long now = System.currentTimeMillis();
+
+        // 1.5초 이내에 뒤로가기를 또 터치했으면 앱 종료
+        if ( now - lastTimeBackPressed < 1500 ) {
+            finish();
+            return;
+        }
+
+        String msg = "'뒤로가기' 를 한번 더 누르면 앱이 종료됩니다.";
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+
+        lastTimeBackPressed = now;
+    }
+	-----------------------------------------------------------------

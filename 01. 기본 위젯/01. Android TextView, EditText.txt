@@ -1,0 +1,28 @@
+01. Android TextView, EditText
+-------------------------------
+
+- XML
+
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------	
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/text01"
+			android:text="Hello World!" />
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/edit01"
+			android:hint="입력" />
+		
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+		※ 자주 쓰는 속성 : textColor, textSize, textStyle

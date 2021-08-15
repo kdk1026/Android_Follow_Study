@@ -1,0 +1,55 @@
+02. Android Button, ImageButton
+---------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------	
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+	
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/btn01"
+			android:text="버튼" />
+
+		<ImageButton
+			android:id="@+id/imgBtn01"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/btn01_18dp" />
+			
+		
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        final Toast toast1 = Toast.makeText(getApplicationContext(), "버튼 클릭", Toast.LENGTH_LONG);
+        final Toast toast2 = Toast.makeText(getApplicationContext(), "이미지 버튼 클릭", Toast.LENGTH_LONG);
+
+        Button btn01 = findViewById(R.id.btn01);
+        btn01.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toast2.cancel();
+                toast1.show();
+            }
+        });
+
+        ImageButton imgBtn01 = findViewById(R.id.imgBtn01);
+        imgBtn01.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toast1.cancel();
+                toast2.show();
+            }
+        });
+    }
+	-----------------------------------------------------------------

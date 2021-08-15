@@ -1,0 +1,98 @@
+01. Android Webview 기본
+-------------------------------------
+	
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.INTERNET" />
+	-----------------------------------------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnWebView"
+            android:text="웹뷰 테스트"/>
+
+    </LinearLayout>
+	-----------------------------------------------------------------
+
+
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button btnWebView = findViewById(R.id.btnWebView);
+        btnWebView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), Main2Activity.class);
+                startActivity(intent);
+            }
+        });
+    }
+	-----------------------------------------------------------------
+	
+	
+	* 패키지 -> 우클릭 -> New -> Activity -> Empty Activity 
+		: Main2Activity
+	
+	* /res/layout/activity_main2.xml
+	-----------------------------------------------------------------
+	...
+	
+		<WebView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/webView1" />
+	-----------------------------------------------------------------
+	
+	
+	<< loadUrl >>
+ 
+ 	* /java/패키지 경로/Main2Activity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main2);
+
+        WebView webView1 = findViewById(R.id.webView1);
+        webView1.loadUrl("http://www.naver.com");
+    }
+	-----------------------------------------------------------------
+	
+	
+	<< loadData >>
+	
+ 	* /java/패키지 경로/Main2Activity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main2);
+
+        WebView webView1 = findViewById(R.id.webView1);
+		
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!doctype html>");
+        sb.append("<html>");
+        sb.append("<head>");
+        sb.append("<meta charset='UTF-8' />");
+        sb.append("<title>").append("WebView loadData Test").append("</title>");
+        sb.append("</head>");
+        sb.append("<body>").append("<div>테스트</div>");
+        sb.append("</body>");
+        sb.append("</html");
+		
+		webView1.loadData(sb.toString(), "text/html; charset=UTF-8", null);
+    }
+	-----------------------------------------------------------------

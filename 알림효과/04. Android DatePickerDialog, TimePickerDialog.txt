@@ -1,0 +1,87 @@
+Android DatePickerDialog, TimePickerDialog
+-------------------------------------------
+
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="기간 선택"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="시간 선택"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+	-----------------------------------------------------------------
+	
+	* src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.processDatePcikerDialog();
+        this.processTimePickerDialog();
+    }
+
+    private void processDatePcikerDialog() {
+        int nYear = LocalDateTime.now().getYear();
+        int nMonth = LocalDateTime.now().getMonthValue();
+        int nDay = LocalDateTime.now().getDayOfMonth();
+
+        TextView textDate = findViewById(R.id.textDate);
+        textDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        LocalDate localDate = LocalDate.of(year, month, dayOfMonth);
+
+                        /*
+                            네 이놈!!! 분명 같은 Java 이거늘
+                            어찌하여 이것이 오류라는 것이냐!!!
+                            DateTimeFormatter.ofPattern("YYYY-MM-DD");
+
+                            [오류 내용]
+                            java.time.DateTimeException: Field DayOfYear cannot be printed as the value 227 exceeds the maximum print width of 2
+                         */
+                        textDate.setText( localDate.format(DateTimeFormatter.ISO_LOCAL_DATE) );
+                    }
+                }, nYear, nMonth, nDay);
+
+                datePickerDialog.show();
+            }
+        });
+    }
+
+    private void processTimePickerDialog() {
+        int nHour = LocalDateTime.now().getHour();
+        int nMinute = LocalDateTime.now().getMinute();
+
+        TextView textTime = findViewById(R.id.textTime);
+        textTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        LocalTime localTime = LocalTime.of(hourOfDay, minute);
+
+                        textTime.setText( localTime.format(DateTimeFormatter.ISO_LOCAL_TIME) );
+                    }
+                }, nHour, nMinute, false);
+
+                timePickerDialog.show();
+            }
+        });
+    }
+	-----------------------------------------------------------------

@@ -1,0 +1,132 @@
+Android 진동, 알림
+----------------
+	
+	* src/main/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.VIBRATE" />
+	-----------------------------------------------------------------
+	
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnVibrate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="진동"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnRingtonePlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="시스템 효과음 켜기"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnRingtoneStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="시스템 효과음 끄기"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnMediaPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="임의의 효과음 켜기"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnMediaStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:text="임의의 효과음 끄기"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+	-----------------------------------------------------------------
+
+
+	* src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    private Ringtone ringtone;
+    private MediaPlayer mediaPlayer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.processVibrate();
+        this.processRingtone();
+        this.processMediaPlayer();
+    }
+
+    private void processVibrate() {
+        Button btnVibrate = findViewById(R.id.btnVibrate);
+        btnVibrate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Vibrator vib = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                vib.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+        });
+    }
+
+    private void processRingtone() {
+        Button btnRingtonePlay = findViewById(R.id.btnRingtonePlay);
+        btnRingtonePlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                    TYPE_RINGTONE = 1; / TYPE_NOTIFICATION = 2; / TYPE_ALARM = 4;
+                    TYPE_ALL = TYPE_RINGTONE | TYPE_NOTIFICATION | TYPE_ALARM;
+                 */
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                ringtone.play();
+            }
+        });
+
+        Button btnRingtoneStop = findViewById(R.id.btnRingtoneStop);
+        btnRingtoneStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( ringtone != null && ringtone.isPlaying() ) {
+                    ringtone.stop();
+                }
+            }
+        });
+    }
+
+    private void processMediaPlayer() {
+        Button btnMediaPlay = findViewById(R.id.btnMediaPlay);
+        btnMediaPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                    src/main/res/raw 폴더 생성 후, 적당한 음악 넣어주기
+                 */
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.test);
+                mediaPlayer.start();
+            }
+        });
+
+        Button btnMediaStop = findViewById(R.id.btnMediaStop);
+        btnMediaStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( mediaPlayer != null && mediaPlayer.isPlaying() ) {
+                    mediaPlayer.stop();
+                }
+            }
+        });
+    }
+	-----------------------------------------------------------------	

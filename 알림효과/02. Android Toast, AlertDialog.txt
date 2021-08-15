@@ -1,0 +1,243 @@
+Android Toast, AlertDialog
+---------------------------
+
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnToast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toast"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Alert"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnConfirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="Confirm"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="리스트"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:text="체크박스"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnRadio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:text="라디오"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+	-----------------------------------------------------------------
+	
+	* src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.processToast();
+        this.processAlert();
+        this.processConfirm();
+        this.processList();
+        this.processCheckbox();
+        this.processRadio();
+    }
+
+    private void processToast() {
+        Button btnToast = findViewById(R.id.btnToast);
+        btnToast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // LENGTH_SHORT, LENGTH_LONG
+                Toast.makeText(getApplicationContext(), "HelloWorld", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void processAlert() {
+        Button btnAlert = findViewById(R.id.btnAlert);
+        btnAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                    android.app.AlertDialog 권장
+                    https://dreamaz.tistory.com/63
+                 */
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.setTitle("알림");
+                builder.setMessage("HelloWorld");
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
+    private void processConfirm() {
+        Button btnConfirm = findViewById(R.id.btnConfirm);
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                // setNeutralButton 도 추가 가능, 좌측 정렬, 근데 어디에 써먹노????
+
+                builder.setCancelable(false);
+                builder.setTitle("알림");
+                builder.setMessage("프로그램을 종료 하시겠습니까?");
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
+    private void processList() {
+        final String[] animals = {"개", "고양이", "돼지", "소", "닭"};
+        
+        Button btnList = findViewById(R.id.btnList);
+        btnList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("동물");
+                builder.setItems(animals, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), animals[which], Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
+    private void processCheckbox() {
+        final String[] animals = {"개", "고양이", "돼지", "소", "닭"};
+        final boolean[] checkeds = {false, false, false, false, true};
+
+        Button btnCheck = findViewById(R.id.btnCheck);
+        btnCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("동물");
+                builder.setMultiChoiceItems(animals, checkeds, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        checkeds[which] = isChecked;
+                    }
+                });
+
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        List<String> animalList = new ArrayList<>();
+
+                        for (int i=0; i < checkeds.length; i++) {
+                            if ( checkeds[i] ) {
+                                animalList.add(animals[i]);
+                            }
+                        }
+
+                        String str = "선택된 값은 : " + String.join(", ", animalList);
+                        Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
+    private void processRadio() {
+        final String[] animals = {"개", "고양이", "돼지", "소", "닭"};
+        final int[] nCheckedPosition = {0};
+
+        Button btnRadio = findViewById(R.id.btnRadio);
+        btnRadio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("동물");
+                builder.setSingleChoiceItems(animals, nCheckedPosition[0], new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        /*
+                            안드로이드 스튜디오 제시에 동의했더니 이렇게 변했다...
+                            님은 뭔가요? 처음 보는 문법입니다만...
+                         */
+                        nCheckedPosition[0] = which;
+                    }
+                });
+
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String str = "선택된 값은 : " + animals[nCheckedPosition[0]];
+                        Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+	-----------------------------------------------------------------

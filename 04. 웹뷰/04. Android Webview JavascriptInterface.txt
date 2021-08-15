@@ -1,0 +1,113 @@
+04. Android Webview JavascriptInterface
+----------------------------------------
+	- Javascript와 App간에 메시지 주고 받기
+
+<< Android >>	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Javascript 전송"
+        app:layout_constraintStart_toStartOf="@+id/webView"
+        app:layout_constraintTop_toTopOf="@+id/webView" />
+	-----------------------------------------------------------------
+	
+	* Java 패키지 -> 우클릭 -> New -> Package, Java Class
+	
+	* /java/패키지 경로/bridge/WebViewBridge
+	-----------------------------------------------------------------
+	public class WebViewBridge {
+
+		private Activity activity;
+		private WebView webView;
+
+		public WebViewBridge(Activity activity, WebView webView) {
+			this.activity = activity;
+			this.webView = webView;
+		}
+
+		@JavascriptInterface
+		public void recvMsg(String msg) {
+			Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+		}
+
+	}
+	-----------------------------------------------------------------
+	
+ 	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private WebViewBridge webViewBridge;
+    private WebView webView;
+    private WebSettings webSettings;
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webViewBridge = new WebViewBridge(MainActivity.this, webView);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.addJavascriptInterface(webViewBridge, "MyAndroid");
+
+        String url = "http://192.168.0.17:8080/test.jsp";
+        webView.loadUrl(url);
+
+        Button btnSend = findViewById(R.id.btnSend);
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String msg = "Hi Javascript";
+                webView.loadUrl("javascript:fnRecvMsg('" + msg + "')");
+            }
+        });
+    }
+	-----------------------------------------------------------------
+	
+<< JSP >>
+ 	* test.jsp
+	-----------------------------------------------------------------	
+	<body>
+		<div style="margin-top: 100px;">
+			<div>
+				메시지 수신
+				<div id="recvMsg"></div>
+			</div>
+			<br/>
+			<div>
+				메시지 송신
+				<input type="hidden" id="sendMsg" value="Hi Android" />
+				<input type="button" value="App 전송" id="btnSend" onclick="fnGo(); return false;" />
+			</div>
+		</div>
+		
+		<script type="text/javascript">
+		function fnGo() {
+			var vMsg = document.getElementById("sendMsg").value; 
+			fnSendMsg(vMsg);	
+		}
+
+		function fnSendMsg(msg) {
+			window.MyAndroid.recvMsg(msg);
+		}
+
+		function fnRecvMsg(msg) {
+			document.getElementById("recvMsg").innerHTML = msg; 
+		}
+		</script>
+	</body>
+	-----------------------------------------------------------------

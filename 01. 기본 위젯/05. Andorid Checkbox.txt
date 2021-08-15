@@ -1,0 +1,88 @@
+05. Android Checkbox
+---------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="좋아하는 과일" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="사과"
+            android:id="@+id/chk1" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="참외"
+            android:id="@+id/chk2" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="포도"
+            android:id="@+id/chk3" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn1"
+            android:text="확인" />
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        final CheckBox chk1 = findViewById(R.id.chk1);
+        final CheckBox chk2 = findViewById(R.id.chk2);
+        final CheckBox chk3 = findViewById(R.id.chk3);
+
+        Button btn1 = findViewById(R.id.btn1);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String result = "";
+
+                if (chk1.isChecked()) {
+                    if ( result.equals("") ) {
+                        result += chk1.getText().toString();
+                    } else {
+                        result += ", " + chk1.getText().toString();
+                    }
+                }
+
+                if (chk2.isChecked()) {
+                    if ( result.equals("") ) {
+                        result += chk2.getText().toString();
+                    } else {
+                        result += ", " + chk2.getText().toString();
+                    }
+                }
+
+                if (chk3.isChecked()) {
+                    if ( result.equals("") ) {
+                        result += chk3.getText().toString();
+                    } else {
+                        result += ", " + chk3.getText().toString();
+                    }
+                }
+
+                String msg = "결과 : " + result;
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+	-----------------------------------------------------------------

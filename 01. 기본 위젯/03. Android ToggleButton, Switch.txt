@@ -1,0 +1,56 @@
+03. Android ToggleButton, Switch
+---------------------------------
+
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+			
+		<ToggleButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/toggleBtn01"
+			android:text="토글 버튼" />
+
+		<Switch
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/switch01" />
+		
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        ToggleButton toggleBtn01 = findViewById(R.id.toggleBtn01);
+        toggleBtn01.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(getApplicationContext(), "토글 클릭-ON", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "토글 클릭-OFF", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        Switch switch01 = findViewById(R.id.switch01);
+        switch01.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(getApplicationContext(), "스위치 클릭-ON", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "스위치 클릭-OFF", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+	-----------------------------------------------------------------

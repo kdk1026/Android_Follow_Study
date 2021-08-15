@@ -1,0 +1,79 @@
+02. Android Activity 데이터 넘기기1
+-------------------------------------
+	
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="메인 화면"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn01"
+            android:text="Go! Sub" />
+
+    </LinearLayout>
+	-----------------------------------------------------------------
+	
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button btn = findViewById(R.id.btn01);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), SubActivity.class);
+				intent.putExtra("num1", 1);
+                intent.putExtra("num2", 1);
+                startActivity(intent);
+            }
+        });
+    }
+	-----------------------------------------------------------------
+	
+	
+	* 패키지 -> 우클릭 -> New -> Activity -> Empty Activity 
+		: SubActivity
+	
+	* /res/layout/activity_syb.xml
+	-----------------------------------------------------------------
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="서브 화면"/>
+
+    </LinearLayout>
+	-----------------------------------------------------------------	
+ 
+ 	* /java/패키지 경로/SubActivity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_syb);
+
+        Intent intent = getIntent();
+        int num1 = intent.getIntExtra("num1", 0);
+        int num2 = intent.getIntExtra("num2", 0);
+
+        int sum = num1 + num2;
+        String msg = num1 + " + " + num2 + " = " + sum;
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+	-----------------------------------------------------------------

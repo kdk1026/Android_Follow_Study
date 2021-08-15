@@ -1,0 +1,65 @@
+Android 푸시 알림 설정
+────────────
+
+-----------------------------
+1. (사전작업) Firebase Cloud Messaging
+-----------------------------
+	https://firebase.google.com/docs/cloud-messaging/android/client?authuser=0
+	
+	개인 원노트 Programming > Firebase > Firebase Cloud Messaging - Android 참고
+	
+-----------------------------
+2. 알림 만들기 내용 참고
+-----------------------------
+	https://developer.android.com/training/notify-user/build-notification?hl=ko#java
+	
+-----------------------------
+3. MyFirebaseMessagingService
+-----------------------------
+	// 알림 위해 추가
+	private static final String CHANNEL_ID = "channelId";
+	private static final String CHANNEL_NAME = "kdk";	
+	
+	private void createNotificationChannel() {
+		// Create the NotificationChannel, but only on API 26+ because
+		// the NotificationChannel class is new and not in the support library
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			CharSequence name = "kdk";
+			String description = "kdk";
+			int importance = NotificationManager.IMPORTANCE_DEFAULT;
+			NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+			channel.setDescription(description);
+			// Register the channel with the system; you can't change the importance
+			// or other notification behaviors after this
+			NotificationManager notificationManager = getSystemService(NotificationManager.class);
+			notificationManager.createNotificationChannel(channel);
+		}
+	}
+	
+	@Override
+	public void onMessageReceived(RemoteMessage remoteMessage) {
+		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+		this.createNotificationChannel();
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+		
+		...
+		
+		if (remoteMessage.getNotification() != null) {
+			String title = remoteMessage.getNotification().getTitle();
+			String body = remoteMessage.getNotification().getBody();
+
+			Log.d(TAG, "Message Notification Title: " + title);
+			Log.d(TAG, "Message Notification Body: " + body);
+
+			builder.setSmallIcon(R.drawable.ic_launcher_background)
+					.setContentTitle(title)
+					.setContentText("너는 뭐니?")
+					.setStyle(new NotificationCompat.BigTextStyle()
+							.bigText(body))
+					.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+			Notification notification = builder.build();
+			notificationManager.notify(1, notification);
+		}
+	}

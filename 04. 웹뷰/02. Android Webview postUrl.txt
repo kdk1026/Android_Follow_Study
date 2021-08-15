@@ -1,0 +1,54 @@
+02. Android Webview postUrl
+-------------------------------------
+			
+	* 서버단 JSP
+	-----------------------------------------------------------------
+	<% request.setCharacterEncoding("UTF-8"); %>
+	<%
+		String param1 = request.getParameter("param1");
+		String param2 = request.getParameter("param2");
+		
+		pageContext.setAttribute("param1", param1);
+		pageContext.setAttribute("param2", param2);
+	%>
+	<!DOCTYPE html>
+	<html lang="ko">
+	<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Insert title here</title>
+	</head>
+	<body>
+		<div>Hello</div>
+		
+		<div>param1: ${param1}</div>
+		<div>param2: ${param2}</div>
+	</body>
+	</html>
+	-----------------------------------------------------------------
+	
+ 	* /java/패키지 경로/Main2Activity
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main2);
+
+        WebView webView1 = findViewById(R.id.webView1);
+
+        String url = "http://192.168.0.17:8080/test.jsp";
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            sb.append("param1=").append(URLEncoder.encode("가나다", "UTF-8")).append("&");
+            sb.append("param2=").append(URLEncoder.encode("abc", "UTF-8"));
+
+            webView1.postUrl(url, sb.toString().getBytes());
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+	-----------------------------------------------------------------
+	
+	※ 공유기 포트포워딩 설정 후, 공인 IP로 테스트 / 와이파이 접속 후, 내부 IP로 테스트
