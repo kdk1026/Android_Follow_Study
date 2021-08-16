@@ -9,6 +9,14 @@ Android JSON
 	=============
 	> http://www.mvnrepository.com/
 		>> json 검색
+
+	=============================================================
+	https://developer.android.com/reference/org/json/JSONObject
+
+	여기에도 있었구만 ㅋ 6년 전에는 까볼 생각을 못했으니 ㅋㅋ
+		java.lang.Object
+   			↳	org.json.JSONObject
+	=============================================================
 		
 ----------------------
 * Android TextView 참조
