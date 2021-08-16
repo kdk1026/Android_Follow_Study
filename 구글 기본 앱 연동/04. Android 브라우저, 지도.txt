@@ -1,0 +1,68 @@
+04. Android 브라우저, 지도
+--------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+     * src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnBrowser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="브라우저"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="지도"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBrowser" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.processBrowser();
+        this.processMap();
+    }
+
+    private void processBrowser() {
+        Button btnBrowser = findViewById(R.id.btnBrowser);
+        btnBrowser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String sUrl = "https://www.seoul.go.kr/";
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sUrl));
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void processMap() {
+        Button btnMap = findViewById(R.id.btnMap);
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                    구글 기본 앱 연동이 목적이므로
+                    구글 지도에서 '서울시청' 검색 > 위도/경도 복사
+                        - 카카오맵 깔려 있으면 연결 프로그램 목록에서 카카오맵으로 열기 가능
+                 */
+                String sLatitudeLongitude = "37.56650778436688, 126.97790218258505";
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:"+sLatitudeLongitude));
+                startActivity(intent);
+            }
+        });
+    }
+    -----------------------------------------------------------------
