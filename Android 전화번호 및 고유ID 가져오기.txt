@@ -4,6 +4,9 @@ Android 전화번호 및 고유ID 가져오기
 
 	* src/main/AndroidManifest.xml
 	-----------------------------------------------------------------
+    <!--
+        https://developer.android.com/about/versions/11/privacy/permissions?hl=ko
+    -->
     <!-- Grants the READ_PHONE_STATE permission only on devices that run
          Android 10 (API level 29) and lower. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"
