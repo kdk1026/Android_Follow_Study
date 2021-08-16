@@ -1,0 +1,162 @@
+Android 카메라
+--------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+	* src/main/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <!--
+        기본 실습 시에는 필요 없음
+        추후 추가 실습 시에 필요할 수 있으므로
+    -->
+    <uses-permission android:name="android.permission.CAMERA" />
+	-----------------------------------------------------------------
+
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="192dp"
+        android:text="카메라 연동(이미지)"
+        app:layout_constraintBottom_toTopOf="@+id/videoView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnImage"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/btnVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:text="카메라 연동(동영상)"
+        app:layout_constraintBottom_toTopOf="@+id/videoView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnVideo" />
+    -----------------------------------------------------------------
+
+	* src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+
+    private static final String TAG = "***MainActivity";
+
+    private static final int MEDIA_TYPE_IMAGE = 30;
+    private static final int MEDIA_TYPE_VIDEO = 20;
+
+    private ImageView imageView;
+    private VideoView videoView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        /*
+            - 일단 기본만 실습
+            - 추후 시간되고, 생각나고, 몸이 움직이면 추가 실습
+                1) 내부/외부 저장소에 저장
+                    : 구글링 (아래 내용하고는 다른거 같던데 아닌가??)
+
+                2) 파일 공유 방법
+                    https://github.com/kkangseongyun/kkangs_android/tree/master/PDF
+                        14장 - Intent와 구글 기본 앱 연동.pdf
+         */
+        this.processImage();
+        this.processVideo();
+    }
+
+    private void processImage() {
+        imageView = findViewById(R.id.imageView);
+
+        Button btnImage = findViewById(R.id.btnImage);
+        btnImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, MEDIA_TYPE_IMAGE);
+
+                /*
+                    // https://www.codingdemos.com/android-onactivityresult-is-deprecated-now-what/
+
+                    // TODO : deprecated 되었건만... 어쩔 수가 없다... 아오!! 힘들게 찾았드만 에러가 아주!!!
+
+                    [오류내용]
+                    LifecycleOwner com.example.testapp.MainActivity@ce40734 is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED
+                 */
+//                ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
+//                    new  ActivityResultContracts.StartActivityForResult(),
+//                    new ActivityResultCallback<ActivityResult>() {
+//                        @Override
+//                        public void onActivityResult(ActivityResult result) {
+//                            Log.d(TAG, "onActivityResult : " + result.getResultCode());
+//                            Log.d(TAG, "onActivityResult : " + result.getData());
+//
+//                            if ( result.getResultCode() == RESULT_OK && result.getData() != null ) {
+//                                Bundle bundle = result.getData().getExtras();
+//                                Bitmap bitmap = (Bitmap) bundle.get("data");
+//                                imageView.setImageBitmap(bitmap);
+//                            }
+//                        }
+//                });
+//                startActivityResult.launch(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if ( resultCode == RESULT_OK ) {
+            if ( requestCode == MEDIA_TYPE_IMAGE ) {
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                imageView.setImageBitmap(bitmap);
+            }
+
+            if ( requestCode == MEDIA_TYPE_VIDEO ) {
+                Log.d(TAG, "onActivityResult : " + data.getData());
+                videoView.setVideoURI(Uri.parse(data.getDataString()) );
+
+                final MediaController mediaController = new MediaController(MainActivity.this);
+                videoView.setMediaController(mediaController);
+
+                videoView.start();
+            }
+        }
+    }
+
+    private void processVideo() {
+        videoView = findViewById(R.id.videoView);
+
+        Button btnVideo = findViewById(R.id.btnVideo);
+        btnVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+                intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 20);
+                intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 1024 * 1024 * 10);
+                startActivityForResult(intent, MEDIA_TYPE_VIDEO);
+                
+                // TODO : processImage 의 TODO 와 상동
+            }
+        });
+    }
+    -----------------------------------------------------------------
