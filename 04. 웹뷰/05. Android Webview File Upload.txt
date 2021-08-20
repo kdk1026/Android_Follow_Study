@@ -1,0 +1,61 @@
+05. Android Webview File Upload
+----------------------------------------
+    - html <input type="file">은 네이티브 쪽에서 아무 처리도 해주지 않으면, 아무런 반응도 일어나지 않음
+
+ 	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    public static final int IMAGE_SELECTOR_REQ = 1;
+    private ValueCallback mFilePathCallback;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback filePathCallback, FileChooserParams fileChooserParams) {
+                mFilePathCallback = filePathCallback;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                
+                // 여러장의 사진을 선택하는 경우 필요 <input type="file" multiple>
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+
+                startActivityForResult(Intent.createChooser(intent,"Select Picture"), IMAGE_SELECTOR_REQ);
+                return true;
+            }
+        });
+
+        webView.loadUrl(url);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IMAGE_SELECTOR_REQ) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data.getClipData() != null) {
+                    int count = data.getClipData().getItemCount();
+                    Uri[] uris = new Uri[count];
+                    for (int i = 0; i < count; i++) {
+                        uris[i] = data.getClipData().getItemAt(i).getUri();
+                    }
+                    mFilePathCallback.onReceiveValue(uris);
+                } else if (data.getData() != null) {
+                    mFilePathCallback.onReceiveValue(new Uri[]{data.getData()});
+                }
+            }
+        }
+    }
+    -----------------------------------------------------------------
