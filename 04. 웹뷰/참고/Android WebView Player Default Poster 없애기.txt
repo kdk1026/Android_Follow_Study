@@ -1,0 +1,31 @@
+Android WebView Player Default Poster 없애기
+----------------------------------------------
+    - https://ddunnimlabs.tistory.com/93
+
+    - html의 video 태그에 해당
+
+ 	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public Bitmap getDefaultVideoPoster()
+                return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+            }
+        });
+
+        webView.loadUrl(url);
+    }
+    -----------------------------------------------------------------
