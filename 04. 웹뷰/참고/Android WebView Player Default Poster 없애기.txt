@@ -17,7 +17,6 @@ Android WebView Player Default Poster 없애기
         webView = findViewById(R.id.webView);
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        webView.setWebChromeClient(new WebChromeClient());
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
