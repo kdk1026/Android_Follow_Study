@@ -1,0 +1,70 @@
+08. Android Webview Cookie 동기화
+----------------------------------
+    - MainActivity 에서만 하면 강제 종료 시, 동기화가 안된다.
+
+    - OS에 의한 강제종료는 감지 불가하지만, Task의 종료시점은 확인 가능
+    - 사용자가 확인할 수 있는 최근에 실행된 앱 보기에 나오는 하나의 단위가 바로 Task
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * com/example/testapp/service/TaskService.java
+    -----------------------------------------------------------------
+    public class TaskService extends Service {
+
+        private static final String TAG = "***TaskService";
+
+        @Nullable
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
+
+        @Override
+        public void onTaskRemoved(Intent rootIntent) {
+            super.onTaskRemoved(rootIntent);
+
+            Log.d(TAG, "onTaskRemoved : " + rootIntent);
+
+            CookieManager.getInstance().flush();
+            stopSelf();
+        }
+    }
+    -----------------------------------------------------------------
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+        <service android:name=".service.TaskService"
+            android:stopWithTask="false" />
+	-----------------------------------------------------------------
+
+    * com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        startService(new Intent(this, TaskService.class));
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                CookieManager.getInstance().flush();
+            }
+        });
+
+        webView.loadUrl("http://in4in.com/kdk/test.html");
+    }
+    -----------------------------------------------------------------
