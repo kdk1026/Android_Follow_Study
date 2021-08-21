@@ -1,0 +1,39 @@
+Android 타이틀바 없애기
+-----------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    - 전체 적용 시, 전역 방식
+    - 화면에 따라 적용 시, 해당 Activity에 설정
+
+<< 전역 >>
+    * src/main/AndroidManifest.xml
+    -----------------------------------------------------------------
+    android:theme="@style/Theme.TestApp"
+
+        클릭해서 커서 위치시키고 F3
+    -----------------------------------------------------------------
+
+    * src/main/res/values/themes.xml
+    -----------------------------------------------------------------
+    <style name="Theme.TestApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+
+    를 다음과 같이 변경
+
+    <style name="Theme.TestApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    -----------------------------------------------------------------
+
+<< 필요한 Activity >>
+    * src/main/java/com/example/testapp/SplashActivity.java
+    -----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        ...
+    }
+    -----------------------------------------------------------------
+

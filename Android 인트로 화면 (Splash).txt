@@ -35,7 +35,7 @@ Android 인트로 화면 (Splash)
         app:layout_constraintTop_toTopOf="parent" />
     -----------------------------------------------------------------
 
-    * src/main/java/com/example/testapp/MainActivity.java
+    * src/main/java/com/example/testapp/SplashActivity.java
 	-----------------------------------------------------------------
     @Override
     protected void onCreate(Bundle savedInstanceState) {
