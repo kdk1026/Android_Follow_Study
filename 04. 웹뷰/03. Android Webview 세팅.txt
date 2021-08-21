@@ -35,6 +35,8 @@
 		
 		// 웹뷰내의 JS의 window.open()을 허용할 것인지에 대한 여부
 		webSettings.setAllowFileAccessFromFileURLs(true);
+
+		// 웹뷰내의 Ajax 허용 여부
         webSettings.setAllowUniversalAccessFromFileURLs(true);
 		
 		// HTTPS HTTP의 연동, 서로 호출 가능하도록
