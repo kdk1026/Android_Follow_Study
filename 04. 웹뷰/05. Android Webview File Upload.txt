@@ -19,7 +19,6 @@
         webView = findViewById(R.id.webView);
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        webView.setWebChromeClient(new WebChromeClient());
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
