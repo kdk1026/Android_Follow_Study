@@ -1,0 +1,98 @@
+06. Android Webview Splash
+----------------------------
+    - WebView를 처음 띄울때 이미지가 많거나 리소스 용량이 크면 WebView에 로딩이 늦게 되는 경우가 있는데, 
+        이럴때 WebView가 모두 로딩 되기 전에 로딩 화면 띄움
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/splashView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/meric_dagli">
+
+        </ImageView>
+
+    </RelativeLayout>
+    -----------------------------------------------------------------
+
+    * /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    private RelativeLayout splashView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        splashView = findViewById(R.id.splashView);
+
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                splashView.animate()
+                        .alpha(0.0f)
+                        .setDuration(1000)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                splashView.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        });
+                super.onPageFinished(view, url);
+            }
+        });
+
+        webView.loadUrl("http://in4in.com/kdk/a.html");
+
+        /*
+            ERR_CLEARTEXT_NOT_PERMITTED 오류
+
+                - AndroidManifest.xml
+                    android:usesCleartextTraffic="true"
+        */
+    }
+    -----------------------------------------------------------------
