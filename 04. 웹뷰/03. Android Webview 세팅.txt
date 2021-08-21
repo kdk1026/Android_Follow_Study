@@ -39,8 +39,42 @@
 		
 		// HTTPS HTTP의 연동, 서로 호출 가능하도록
 		webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+
+		// window.open() 제대로 동작
+		webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+		// 앱에 등록되어 있는 이미지 리소스를 자동으로 로드하도록 설정
+		webSettings.setLoadsImagesAutomatically(true);
+
+		// wide viewport를 사용하도록 설정 (html 컨텐츠가 웹뷰에 맞게 나타나도록 함)
+		webSettings.setUseWideViewPort(false);
+
+		/*
+			캐시 모드를 설정하는 속성
+				- LOAD_CACHE_ELSE_NETWORK 기간이 만료돼 캐시를 사용할 수 없을 경우 네트워크를 사용합니다.
+				- LOAD_CACHE_ONLY 네트워크를 사용하지 않고 캐시를 불러옵니다.
+				- LOAD_DEFAULT 기본적인 모드로 캐시를 사용하고 만료된 경우 네트워크를 사용해 로드합니다.
+				- LOAD_NORMAL 기본적인 모드로 캐시를 사용합니다.
+				- LOAD_NO_CACHE 캐시모드를 사용하지 않고 네트워크를 통해서만 호출합니다.
+
+				※ 어지간하면 캐시는 No-Cache 추천
+		*/
+		webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+		// 앱 내부 캐시 사용 여부 설정
+		webSettings.setAppCacheEnabled(false);
+
+		// 웹뷰 내에서 파일 액세스 활성화 여부
+		webSettings.setAllowFileAccess(true);
+
+		/*
+			UserAgent에 특정 문자열 추가
+				- 일반적으로 모바일 웹, WebView 의 UserAgent는 동일
+				- 문자열 추가로 애플리케이션 접속 판별 구분
+		*/
+		webSettings.setUserAgentString("InApp");
 		
 		// alert 이나 confirm 창 띄우기
-		webView1.setWebChromeClient(new WebChromeClient());			
+		webView1.setWebChromeClient(new WebChromeClient());
     }
 	-----------------------------------------------------------------
