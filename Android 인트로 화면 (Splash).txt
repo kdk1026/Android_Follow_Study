@@ -1,0 +1,64 @@
+Android 인트로 화면 (Splash)
+-----------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * drawable 폴더에 이미지 준비
+
+    * Empty Activity 생성
+        - java 패키지 우클릭 > New > Activity > Empty Activity
+
+    * src/main/AndroidManifest.xml
+    -----------------------------------------------------------------
+    <!--
+        intent-filter 를 SplashActivity 영역으로 옮김
+    -->
+    <activity android:name=".SplashActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+    <activity android:name=".MainActivity">
+
+    </activity>
+    -----------------------------------------------------------------
+
+    * src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/reno_laithienne"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }, 3000);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+    -----------------------------------------------------------------
