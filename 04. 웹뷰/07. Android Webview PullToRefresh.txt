@@ -1,0 +1,68 @@
+07. Android Webview PullToRefresh
+-----------------------------------
+    - 당겨서 새로고침 기능
+    
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * app/build.gradle
+    -----------------------------------------------------------------
+    // https://mvnrepository.com/artifact/androidx.swiperefreshlayout/swiperefreshlayout
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    -----------------------------------------------------------------
+        ※ https://mvnrepository.com/ 에는 runtimeOnly 이지만 implementation 으로 바꿔야 함
+
+    * src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefreshlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        swipeRefreshLayout = findViewById(R.id.swiperefreshlayout);
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                webView.reload();
+            }
+        });
+
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.loadUrl("http://www.naver.com");
+    }
+    -----------------------------------------------------------------
