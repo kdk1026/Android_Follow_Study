@@ -1,0 +1,127 @@
+Android WevVeiw 팝업 방식1
+-----------------------------
+    - https://onedaycodeing.tistory.com/62
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/webView_frame">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+        />
+
+    </FrameLayout>
+    -----------------------------------------------------------------
+
+    * /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private FrameLayout frameLayout;
+    private WebView webView;
+    private WebSettings webSettings;
+
+    private WebView webViewPop;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        frameLayout = findViewById(R.id.webView_frame);
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        
+        /*
+            true : 웹뷰 화면 전환
+                - 뒤로 가기 버튼 누르면 앱 종료
+                - 훗~ frameLayout.setActivated 이용해서 클리어~
+            
+            false : 웹브라우저 띄움 (Default)
+                - 뒤로 가기 버튼 누르면 브라우저만 종료
+         */
+        webSettings.setSupportMultipleWindows(true);
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                webViewPop = new WebView(view.getContext());
+                webViewPop.getSettings().setJavaScriptEnabled(true);
+
+                webViewPop.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+                webViewPop.getSettings().setSupportMultipleWindows(true);
+                webViewPop.getSettings().setDomStorageEnabled(true);
+
+                webViewPop.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,
+                        ConstraintLayout.LayoutParams.MATCH_PARENT));
+
+                webViewPop.setWebChromeClient(new WebChromeClient() {
+                    @Override
+                    public void onCloseWindow(WebView window) {
+                        frameLayout.removeView(window);
+                        frameLayout.setActivated(false);
+                        window.destroy();
+                    }
+                });
+
+                webViewPop.setWebViewClient(new WebViewClient(){
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                        return false;
+                    }
+                });
+
+                frameLayout.addView(webViewPop);
+                frameLayout.setActivated(true);
+
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(webViewPop);
+                resultMsg.sendToTarget();
+
+                return true;
+            }
+        });
+
+        webView.loadUrl("http://in4in.com/kdk/a.html");
+
+        /*
+            ERR_CLEARTEXT_NOT_PERMITTED 오류
+
+                - AndroidManifest.xml
+                    android:usesCleartextTraffic="true"
+        */
+    }
+
+    /**
+     * <pre>
+     * WebView 뒤로가기 처리
+     *  - 참고/Android WebView 페이지 이동, 뒤로가기.txt 참고
+     * </pre>
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ( keyCode == KeyEvent.KEYCODE_BACK ) {
+            if ( frameLayout.isActivated() ) {
+                /*
+                    만약 팝업에 닫기 버튼 있는 경우,
+                    JavascriptInterface 이용해서 추가적으로 처리를 해줘야 한다고 한다.
+                */
+                webViewPop.loadUrl("javascript:window.close();");
+                return false;
+            }
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+    -----------------------------------------------------------------
