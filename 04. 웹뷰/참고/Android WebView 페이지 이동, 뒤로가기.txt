@@ -1,0 +1,64 @@
+Android WebView 페이지 이동, 뒤로가기
+-------------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+ 	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.setWebViewClient(new WebViewClient() {
+            /**
+             * WebView 페이지 이동 처리
+             * @param view
+             * @param request
+             * @return
+             */
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String sUrl = request.getUrl().toString();
+                view.loadUrl(sUrl);
+                return true;
+            }
+        });
+
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.loadUrl("http://in4in.com/kdk/a.html");
+
+        /*
+            ERR_CLEARTEXT_NOT_PERMITTED 오류
+
+                - AndroidManifest.xml
+                    android:usesCleartextTraffic="true"
+         */
+    }
+
+    /**
+     * <pre>
+     * WebView 뒤로가기 처리
+     *  - 아무 처리도 해주지 않으면, 앱이 종료됨
+     * </pre>
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ( (keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack() ) {
+            webView.goBack();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    -----------------------------------------------------------------
