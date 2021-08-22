@@ -243,9 +243,30 @@ public class FileUtil {
     }
 
     /**
-     * 내붖 저장소
+     * 내부 저장소
      */
     public static class Inner {
+        /**
+         * 내부 저장소 경로 가져오기
+         * 
+         * @param context
+         * @return
+         */
+        public String getFilePath(Context context) {
+            return context.getFilesDir().getAbsolutePath();
+        }
+
+        /**
+         * 파일 경로 가져오기
+         * 
+         * @param context
+         * @param fileNm
+         * @return
+         */
+        public String getFilePath(Context context, String fileNm) {
+            return context.getFileStreamPath(fileNm).getAbsolutePath();
+        }
+
         /**
          * 텍스트 내용을 파일로 생성
          * 
@@ -288,6 +309,19 @@ public class FileUtil {
             }
 
             return sTxt;
+        }
+
+        /**
+         * 파일 삭제
+         * 
+         * @param context
+         * @param fileNm
+         * @return
+         */
+        public boolean removeFile(Context context, String fileNm) {
+            File dir = context.getFilesDir();
+            File file = new File(dir, fileNm);
+            return file.delete();
         }
     }
 

@@ -1,0 +1,73 @@
+03. Android File (내부 저장소)
+------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+     * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnFileTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:text="파일 테스트"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/util/FileUtil.java
+    -----------------------------------------------------------------
+    저장공간/유틸/FileUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+    -----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    public static class Constants {
+        public static String fileNm = "kdkFile.dat";
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Log.d(TAG, FileUtil.getInnerInstance().getFilePath(getApplicationContext()) );
+        // [로그] /data/user/0/com.example.testapp/files
+
+        Button btnFileTest = findViewById(R.id.btnFileTest);
+        btnFileTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String sTxt = "묻지마라 왜냐고 왜 그렇게 높은 곳까지 오르려 애쓰는지 묻지를 마라";
+                FileUtil.getInnerInstance().writeFile(getApplicationContext(), Constants.fileNm, sTxt);
+
+                String sPath = FileUtil.getInnerInstance().getFilePath(getApplicationContext(), Constants.fileNm);
+                Log.d(TAG, "getFilePath : " + sPath);
+
+                /*
+                    View - Tool Windows > Device File Explorer
+
+                        니미 눈에 불을 키고 찾아봤다....
+                        /data/user/0 이딴거 찾을 수가 없다...
+
+                        /data/data/com.example.testapp/files/kdkFile.dat
+                 */
+
+                String sRet = FileUtil.getInnerInstance().readFile(getApplicationContext(), Constants.fileNm);
+                Log.d(TAG, "readFile : " + sRet);
+
+                boolean isRemoved = FileUtil.getInnerInstance().removeFile(getApplicationContext(), Constants.fileNm);
+                Log.d(TAG, "removeFile : " + isRemoved);
+                /*
+                    View - Tool Windows > Device File Explorer
+
+                        파일이 남아 있다...
+                        /data/data/com.example.testapp/files 우클릭 > Synchronize
+                        파일 삭제 확인
+                 */
+            }
+        });
+    }
+    -----------------------------------------------------------------
