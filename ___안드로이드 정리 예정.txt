@@ -1,0 +1,19 @@
+* 파일 저장 읽기, 내부 저장소 / 외부 저장소
+	- 내부 저장소만
+https://javapp.tistory.com/126?category=348168
+
+
+* SQLite
+https://javapp.tistory.com/129?category=348168
+
+
+* 시스템 메시지 : BroadcastReceiver [문자 메시지 읽기]
+https://javapp.tistory.com/117?category=348168
+
+
+* BroadCast Reciever
+https://javapp.tistory.com/110?category=348168
+
+
+* GPS 현재 위치 가져오기
+https://shihis123.tistory.com/entry/Android-GPS-%ED%98%84%EC%9E%AC-%EC%9C%84%EC%B9%98-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0LocationLatitudeLongitude
