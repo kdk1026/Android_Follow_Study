@@ -1,8 +1,3 @@
-* 파일 저장 읽기, 내부 저장소 / 외부 저장소
-	- 내부 저장소만
-https://javapp.tistory.com/126?category=348168
-
-
 * SQLite
 https://javapp.tistory.com/129?category=348168
 
