@@ -24,9 +24,18 @@ import androidx.core.app.ActivityCompat;
 
 /**
  * <pre>
+ * 개정이력
+ * -----------------------------------
+ * 2021. 8. 22. 김대광	최초 작성
+ * </pre>
+ *
+ * <pre>
  * 안드로이드 파일 유틸
  *      - 파일 읽기 : 텍스트 파일이 아닌 경우에는 해당 Activity 에서 만들어야 할 듯? 종류가 너무 많아서 유틸화 불가
  * </pre>
+ *
+ * @author 김대광
+ * @Description : 1.6 기반
  */
 public class FileUtil {
 
