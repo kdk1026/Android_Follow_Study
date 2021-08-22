@@ -66,7 +66,11 @@ public class FileUtil {
         public static final int PERMISSIONS_REQUEST = 1;
 
         /**
+         * <pre>
          * 권한 팝업 요청
+         *      - Android 11 권한 설정 화면 전환
+         *      - below Android 11 권한 팝업 요청
+         * </pre>
          * 
          * @param context
          * @param activity
