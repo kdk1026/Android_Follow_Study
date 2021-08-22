@@ -17,3 +17,10 @@ https://javapp.tistory.com/110?category=348168
 
 * GPS 현재 위치 가져오기
 https://shihis123.tistory.com/entry/Android-GPS-%ED%98%84%EC%9E%AC-%EC%9C%84%EC%B9%98-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0LocationLatitudeLongitude
+
+
+* 그외
+	- 프로젝트 협업 시, 경험했던 것
+
+	[HttpClient] Volley
+	[기타] QR코드 읽기, 바코드 읽기
