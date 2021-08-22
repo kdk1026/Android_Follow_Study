@@ -1,0 +1,63 @@
+01. Android SharedPreferences
+-------------------------------
+    - 간단한 데이터 저장 용이
+    - 보통 초기값, 초기 설정값 등을 저장하는 데에 사용
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+    -----------------------------------------------------------------
+    public static class Constants {
+        public static String spNm = "test";
+        public static String spKey = "hello";
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.spNm, MODE_PRIVATE);
+
+        //------------------------------------
+        // SP에 저장
+        //------------------------------------
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constants.spKey, "안녕");
+        editor.commit();
+
+        //------------------------------------
+        // SP 에서 가져오기
+        //------------------------------------
+        String sVal = sharedPreferences.getString(Constants.spKey, "뭥미");
+
+        TextView textView = findViewById(R.id.textView);
+        textView.setText(sVal);
+    }
+    -----------------------------------------------------------------
+
+    * 테스트 방법
+    -----------------------------------------------------------------
+    1. 코드 주석 처리
+        // editor.commit();
+
+    2. 설정 - 애플리케이션 - 'Test App' 검색 - 저장공간 - 데이터 삭제
+
+    3. 앱 재실행
+
+    ※ 개념상으로는 되어야 하는데, 
+        editor.putString 만 주석 처리하면 안된다... 왜???
+    -----------------------------------------------------------------
