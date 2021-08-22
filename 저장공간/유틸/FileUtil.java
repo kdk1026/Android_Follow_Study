@@ -78,23 +78,38 @@ public class FileUtil {
     }
 
     /**
-     * 폴더 생성
+     * 외부 저장소 파일
      * 
-     * @param folderName
+     * @param filePath
      * @param hasPermission
+     * @param environmentDirectory
+     * 
+     *                             <pre>
+     *      : Environment.DIRECTORY_ALARMS ~ Environment.DIRECTORY_MUSIC
+     *                             </pre>
+     * 
      * @return
      */
-    public boolean makeDir(String folderName, boolean hasPermission) {
-        File dir = null;
+    public File getExternalFile(String filePath, boolean hasPermission, String environmentDirectory) {
+        File file = null;
 
         if (hasPermission) {
-            dir = Environment.getExternalStoragePublicDirectory(folderName);
+            file = Environment.getExternalStoragePublicDirectory(filePath);
         } else {
-            dir = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),
-                    folderName);
+            file = new File(Environment.getExternalStoragePublicDirectory(environmentDirectory).getAbsolutePath(),
+                    filePath);
         }
 
+        return file;
+    }
+
+    /**
+     * 폴더 생성
+     * 
+     * @param dir
+     * @return
+     */
+    public boolean makeDir(File dir) {
         if (dir == null) {
             return false;
         }
@@ -109,21 +124,10 @@ public class FileUtil {
     /**
      * 텍스트 내용을 해당 경로에 파일로 생성
      * 
-     * @param filePath
-     * @param hasPermission
+     * @param file
      * @param text
      */
-    public void writeFile(String filePath, boolean hasPermission, String text) {
-        File file = null;
-
-        if (hasPermission) {
-            file = Environment.getExternalStoragePublicDirectory(filePath);
-        } else {
-            file = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),
-                    filePath);
-        }
-
+    public void writeFile(File file, String text) {
         // 안드로이드는 try-with-resources 사용을 못하나 보구만...
 
         OutputStream os = null;
@@ -152,21 +156,10 @@ public class FileUtil {
     /**
      * 파일을 문자열로 읽음
      * 
-     * @param filePath
-     * @param hasPermission
+     * @param file
      * @return
      */
-    public String readFile(String filePath, boolean hasPermission) {
-        File file = null;
-
-        if (hasPermission) {
-            file = Environment.getExternalStoragePublicDirectory(filePath);
-        } else {
-            file = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),
-                    filePath);
-        }
-
+    public String readFile(File file) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         InputStream is = null;
         FileInputStream fis = null;
@@ -210,15 +203,15 @@ public class FileUtil {
      * 
      * @param filePath
      * @param hasPermission
+     * @param environmentDirectory
      */
-    public void removeFile(String filePath, boolean hasPermission) {
+    public void removeFile(String filePath, boolean hasPermission, String environmentDirectory) {
         File file = null;
 
         if (hasPermission) {
             file = Environment.getExternalStoragePublicDirectory(filePath);
         } else {
-            file = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),
+            file = new File(Environment.getExternalStoragePublicDirectory(environmentDirectory).getAbsolutePath(),
                     filePath);
         }
 
@@ -226,7 +219,7 @@ public class FileUtil {
             File[] files = file.listFiles();
 
             for (File f : files) {
-                removeFile(f.getAbsolutePath(), hasPermission);
+                removeFile(f.getAbsolutePath(), hasPermission, environmentDirectory);
                 Log.d(TAG, "파일이 삭제되었습니다.");
             }
 

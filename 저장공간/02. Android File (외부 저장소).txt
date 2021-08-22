@@ -38,21 +38,26 @@
         btnFileTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isMaked = FileUtil.getInstance().makeDir(Constants.dirNm, true);
+                File dir = FileUtil.getInstance().getExternalFile(Constants.dirNm, true, null);
+                boolean isMaked = FileUtil.getInstance().makeDir(dir);
                 Log.d(TAG, "makeDir : " + Boolean.toString(isMaked));
 
                 if ( isMaked ) {
                     String sFilePath1 = Constants.dirNm + File.separator + Constants.fileNm;
-                    FileUtil.getInstance().writeFile(sFilePath1, true, "살어리 살어리랏다");
-                    
+                    File file1 = FileUtil.getInstance().getExternalFile(sFilePath1, true, null);
+                    FileUtil.getInstance().writeFile(file1, "살어리 살어리랏다");
+                    Log.d(TAG, "writeFile : " + file1.exists());
+
                     // 테스르를 위해 해당 경로에 텍스트 파일 생성해둠
-                    String sFilePath2 = Constants.dirNm + File.separator + "abc.txt";
-                    String sTxt = FileUtil.getInstance().readFile(sFilePath2, true);
+                    File file2 = FileUtil.getInstance().getExternalFile("abc.txt", false, Environment.DIRECTORY_DOWNLOADS);
+                    String sTxt = FileUtil.getInstance().readFile(file2);
                     Log.d(TAG, "readFile : " + sTxt);
 
-                    FileUtil.getInstance().removeFile(sFilePath1, true);
+                    FileUtil.getInstance().removeFile(sFilePath1, true, null);
+                    Log.d(TAG, "removeFile file : " + file1.exists());
 
-                    FileUtil.getInstance().removeFile(Constants.dirNm, true);
+                    FileUtil.getInstance().removeFile(Constants.dirNm, true, null);
+                    Log.d(TAG, "removeFile dir : " + dir.exists());
                 }
             }
         });
