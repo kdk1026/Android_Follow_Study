@@ -141,7 +141,7 @@
                     Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 설정 되었습니다. 앱을 재실행합니다.", Toast.LENGTH_LONG).show();
 
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(2000);
 
                         /*
                             재실행 안하면 다음과 같은 에러 발생 (Logcat Error)
@@ -155,6 +155,15 @@
 
                 } else {
                     Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 취소 되었습니다.", Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(2000);
+
+                        this.completelyExit( getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             }
@@ -168,5 +177,11 @@
         Intent mainIntent = Intent.makeRestartActivityTask(componentName);
         context.startActivity(mainIntent);
         Runtime.getRuntime().exit(0);
+    }
+
+    private void completelyExit(Context context) {
+        moveTaskToBack(true);
+        finishAndRemoveTask();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
     -----------------------------------------------------------------
