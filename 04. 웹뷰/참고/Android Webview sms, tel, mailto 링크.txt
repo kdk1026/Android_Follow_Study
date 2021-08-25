@@ -80,6 +80,8 @@ Android Webview sms, tel, mailto 링크
 
         WebViewSettingUtil.setSettingTotal(webSettings);
 
+        webView.setWebChromeClient(new WebChromeClient());
+        
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
