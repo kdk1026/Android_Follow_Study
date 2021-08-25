@@ -1,0 +1,38 @@
+Androd 설정 화면 이동
+----------------------
+    - 권한 설정 화면으로 이동은 불가
+    - Android OS 자체를 커스터마이징 하는 휴대폰 제조사만 가능
+        > 얼핏 듣기로 빌드만 하루 종일 걸린다고 함
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    * src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="설정 화면 연동"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+	-----------------------------------------------------------------
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button btnSetting = findViewById(R.id.btnSetting);
+        btnSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+    }
+    -----------------------------------------------------------------

@@ -1,0 +1,116 @@
+Android Webview sms, tel, mailto 링크
+---------------------------------------
+    - sms, tel 의 경우, 모바일 브라우저에서 기본적으로 가능
+    - mailto 의 경우, 윈도우/모바일 브라우저에서 기본으로 가능
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+<< HTML >>
+    * common.js는 GitHub 참고
+        - https://github.com/kdk1026/JsUtilsKdk/blob/master/JsUtilsKdk/common.js
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <script src="js/common.js"></script>
+    </head>
+    <body>
+
+        <div>
+            <button id="btnSms">문자 메시지 화면 이동</button>
+            <button id="btnTel">전화 화면 이동</button>
+        
+            <a href="mailto:daekwang1026@gmail.com">daekwang1026@gmail.com</a>
+        </div>
+        
+
+        <script>
+            window.onload = function() {
+                document.querySelector('#btnSms').addEventListener('click', function() {
+                    CommonJS.Mobile.sendSMS(null, '테스트');
+                });
+
+                document.querySelector('#btnTel').addEventListener('click', function() {
+                    CommonJS.Mobile.makeAcall('010-9924-3732');
+                });
+            }
+        </script>
+
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
+     * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/util/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+    04. 웹뷰/유틸/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+    -----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String sUrl = request.getUrl().toString();
+                Log.d(TAG, sUrl);
+
+                // location.href = 'sms:
+                if ( sUrl.startsWith("sms:") ) {
+                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(sUrl));
+                    startActivity(intent);
+                    return true;
+                }
+
+                // location.href = 'tel:
+                if ( sUrl.startsWith("tel:") ) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(sUrl));
+                    startActivity(intent);
+                    return true;
+                }
+
+                // <a href="mailto:
+                if ( sUrl.startsWith("mailto:") ) {
+                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(sUrl));
+                    startActivity(intent);
+                    return true;
+                }
+
+                return super.shouldOverrideUrlLoading(view, request);
+            }
+        });
+
+        webView.loadUrl("https://test-a9f7e.web.app/mobile_alink.html");
+    }
+    -----------------------------------------------------------------

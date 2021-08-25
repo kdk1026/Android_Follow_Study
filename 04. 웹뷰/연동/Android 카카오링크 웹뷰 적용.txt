@@ -1,0 +1,64 @@
+Android 카카오링크 웹뷰 적용
+----------------------------
+    - https://developers.kakao.com/docs/latest/ko/getting-started/sdk-js
+        > 하이브리드 앱에 적용하기
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+		...
+			<queries>
+				<package android:name="com.kakao.talk" />
+			</queries>
+
+		</manifest>
+	-----------------------------------------------------------------
+
+	* Kotlin으로 작성된 예제 -> Java로 변환
+	-----------------------------------------------------------------
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setSupportMultipleWindows(true);
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                CookieManager.getInstance().flush();
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String sUrl = request.getUrl().toString();
+                Log.d(TAG, sUrl);
+
+                if ( request.getUrl().getScheme().equals("intent") ) {
+                    try {
+                        Intent intent = Intent.parseUri(sUrl, Intent.URI_INTENT_SCHEME);
+
+                        if ( intent.resolveActivity(getPackageManager()) != null ) {
+                            startActivity(intent);
+                            Log.d(TAG, "ACTIVITY:" + intent.getPackage());
+                            return true;
+                        }
+
+                        String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                        if ( fallbackUrl != null ) {
+                            view.loadUrl(fallbackUrl);
+                            Log.d(TAG, "FALLBACK:" + fallbackUrl);
+                            return true;
+                        }
+
+                        Log.d(TAG, "Could not parse anythings");
+
+                    } catch (URISyntaxException e) {
+                        Log.e(TAG, "Invalid intent request", e);
+                    }
+                }
+
+                return super.shouldOverrideUrlLoading(view, request);
+            }
+        });
+    -----------------------------------------------------------------
