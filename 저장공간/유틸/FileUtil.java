@@ -35,7 +35,7 @@ import androidx.core.app.ActivityCompat;
  * </pre>
  *
  * @author 김대광
- * @Description : 1.6 기반
+ * @Description : 1.6 기반, minSdkVersion 26 / targetSdkVersion 30
  */
 public class FileUtil {
 
