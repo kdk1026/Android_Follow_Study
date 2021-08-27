@@ -39,7 +39,7 @@ public class FinishRestartUtil {
      * 앱을 재시작
      * @param context
      */
-    private void restart(Context context) {
+    public void restart(Context context) {
         PackageManager packageManager = context.getPackageManager();
         Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
         ComponentName componentName = intent.getComponent();
@@ -53,7 +53,7 @@ public class FinishRestartUtil {
      * @param activity
      * @param context
      */
-    private void completelyExit(Activity activity, Context context) {
+    public void completelyExit(Activity activity, Context context) {
         activity.moveTaskToBack(true);
         activity.finishAndRemoveTask();
         android.os.Process.killProcess(android.os.Process.myPid());

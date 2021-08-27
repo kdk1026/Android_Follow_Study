@@ -1,0 +1,209 @@
+Android 현재 위치 가져오기
+---------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	-----------------------------------------------------------------
+
+     * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <TextView
+        android:id="@+id/text_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:text="위도 : "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="50dp"
+        android:text="경도 : "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/service/LocationService.java
+    -----------------------------------------------------------------
+    public class LocationService extends Service implements LocationListener {
+
+        private static final String TAG = "***LocationService";
+
+        private final Context mContext;
+        private final Activity mActivity;
+
+        private Location location;
+
+        private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+        private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+
+        public LocationService(Context mContext, Activity mActivity) {
+            this.mContext = mContext;
+            this.mActivity = mActivity;
+
+            this.getLocation();
+        }
+
+        public Location getLocation() {
+            try {
+                LocationManager locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+                boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+                if ( isGPSEnabled && isNetworkEnabled ) {
+                    int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                            Manifest.permission.ACCESS_FINE_LOCATION);
+
+                    int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                            Manifest.permission.ACCESS_COARSE_LOCATION);
+
+                    if ( hasFineLocationPermission != PackageManager.PERMISSION_GRANTED &&
+                        hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED ) {
+
+                        return null;
+                    }
+                }
+
+                if ( isNetworkEnabled ) {
+                    // LocationListener를 LocationManager에 등록
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, this.MIN_TIME_BW_UPDATES, this.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    if ( locationManager != null ) {
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    }
+                }
+
+                if ( isGPSEnabled ) {
+                    // LocationListener를 LocationManager에 등록
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, this.MIN_TIME_BW_UPDATES, this.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    if ( locationManager != null ) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, ": " + e.toString());
+            }
+
+            return location;
+        }
+
+        @Nullable
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
+
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(@NonNull String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(@NonNull String provider) {
+
+        }
+
+    }
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+    -----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    public static final int PERMISSIONS_REQUEST = 3;
+
+    private LocationService locationService;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.checkPermission( getApplicationContext() );
+
+        locationService = new LocationService( getApplicationContext(), this );
+
+        Location location = locationService.getLocation();
+
+        if ( location != null ) {
+            TextView text_latitude = findViewById(R.id.text_latitude);
+            String sLatitude = text_latitude.getText().toString() + location.getLatitude();
+            text_latitude.setText(sLatitude);
+
+            TextView text_longitude = findViewById(R.id.text_longitude);
+            String sLongitude = text_longitude.getText().toString() + location.getLongitude();
+            text_longitude.setText(sLongitude);
+        }
+    }
+
+    private void checkPermission(Context context) {
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if ( !ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) ) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST: {
+                if ( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 설정 되었습니다. 앱을 재실행합니다.", Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(2000);
+
+                        /*
+                            재실행 안하면 다음과 같은 에러 발생 (Logcat Error)
+                                - The application does not have sufficient geolocation permissions
+                         */
+                        FinishRestartUtil.getInstance().restart( getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 취소 되었습니다.", Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(2000);
+
+                        FinishRestartUtil.getInstance().completelyExit( this, getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+        }
+    }
+    -----------------------------------------------------------------
