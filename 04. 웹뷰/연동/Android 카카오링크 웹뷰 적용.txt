@@ -138,6 +138,6 @@ Android 카카오링크 웹뷰 적용
             }
         });
 
-        webView.loadUrl("https://test-a9f7e.web.app/link_kakao.html");
+        webView.loadUrl("https://test-a9f7e.web.app/kakao/link_kakao.html");
     }
     -----------------------------------------------------------------

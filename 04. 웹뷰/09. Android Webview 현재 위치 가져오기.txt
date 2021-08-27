@@ -18,7 +18,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
 
-        <script src="js/common.js"></script>
+        <script src="/js/common.js"></script>
     </head>
     <body>
         
@@ -116,7 +116,7 @@
             }
         });
 
-        webView.loadUrl("https://test-a9f7e.web.app/map_kakao.html");
+        webView.loadUrl("https://test-a9f7e.web.app/kakao/map_kakao.html");
     }
 
     private void checkPermission(Context context) {
