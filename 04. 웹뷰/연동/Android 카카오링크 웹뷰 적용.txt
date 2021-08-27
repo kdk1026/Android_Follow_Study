@@ -5,9 +5,55 @@ Android 카카오링크 웹뷰 적용
 
     - minSdkVersion 26 / targetSdkVersion 30
 
+<< HTML >>
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+        <script>
+            Kakao.init('7728684bb39c92f2802312971f9165fd');
+            Kakao.isInitialized();
+        </script>
+    </head>
+    <body>
+
+        <div>
+            <a id="kakao-link-btn" href="javascript:sendLink()">
+                <img
+                src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png"
+                />
+            </a>
+            <script type="text/javascript">
+                function sendLink() {
+                Kakao.Link.sendDefault({
+                    objectType: 'text',
+                    text:
+                    '기본 템플릿으로 제공되는 텍스트 템플릿은 텍스트를 최대 200자까지 표시할 수 있습니다. 텍스트 템플릿은 텍스트 영역과 하나의 기본 버튼을 가집니다. 임의의 버튼을 설정할 수도 있습니다. 여러 장의 이미지, 프로필 정보 등 보다 확장된 형태의 카카오링크는 다른 템플릿을 이용해 보낼 수 있습니다.',
+                    link: {
+                    mobileWebUrl: 'https://developers.kakao.com',
+                    webUrl: 'https://developers.kakao.com',
+                    },
+                })
+                }
+            </script>
+        </div>
+        
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
 	* mainfests/AndroidManifest.xml
 	-----------------------------------------------------------------
 		...
+            <uses-permission android:name="android.permission.INTERNET" />
+
 			<queries>
 				<package android:name="com.kakao.talk" />
 			</queries>
@@ -15,20 +61,50 @@ Android 카카오링크 웹뷰 적용
 		</manifest>
 	-----------------------------------------------------------------
 
-	* Kotlin으로 작성된 예제 -> Java로 변환
+	* /res/layout/activity_main.xml
 	-----------------------------------------------------------------
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        webSettings.setSupportMultipleWindows(true);
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+	-----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/util/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+    04. 웹뷰/유틸/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+        - Kotlin으로 작성된 예제 -> Java로 변환
+	-----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        /*
+            카카오 링크 위한 필수 웹뷰 세팅
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+            webSettings.setSupportMultipleWindows(true);
+         */
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.setWebChromeClient(new WebChromeClient());
 
         webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-
-                CookieManager.getInstance().flush();
-            }
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String sUrl = request.getUrl().toString();
@@ -61,4 +137,7 @@ Android 카카오링크 웹뷰 적용
                 return super.shouldOverrideUrlLoading(view, request);
             }
         });
+
+        webView.loadUrl("https://test-a9f7e.web.app/link_kakao.html");
+    }
     -----------------------------------------------------------------
