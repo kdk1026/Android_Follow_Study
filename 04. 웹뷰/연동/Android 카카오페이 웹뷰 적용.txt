@@ -1,0 +1,158 @@
+Android 카카오페이 웹뷰 적용
+---------------------------
+    - JavaScript Ajax의 경우, CORS에 막혀서 호출 불가
+    - Backend 구축 필요
+
+    - 참고/Android WevVeiw 팝업 방식1.txt 의 확장
+    - https://developers.kakao.com/docs/latest/ko/getting-started/sdk-js
+        > 하이브리드 앱에 적용하기
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+<< Android >>
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+		...
+            <uses-permission android:name="android.permission.INTERNET" />
+
+			<queries>
+				<package android:name="com.kakao.talk" />
+			</queries>
+
+		</manifest>
+	-----------------------------------------------------------------
+
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/webView_frame">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+        />
+
+    </FrameLayout>
+	-----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/util/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+    04. 웹뷰/유틸/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+        - Kotlin으로 작성된 예제 -> Java로 변환
+	-----------------------------------------------------------------
+    private FrameLayout frameLayout;
+    private WebView webView;
+    private WebSettings webSettings;
+
+    private WebView webViewPop;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        frameLayout = findViewById(R.id.webView_frame);
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                webViewPop = new WebView(view.getContext());
+                
+                WebSettings webPopSettings = webViewPop.getSettings();
+                WebViewSettingUtil.setSettingTotal(webPopSettings);
+
+                webViewPop.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT,
+                        ConstraintLayout.LayoutParams.MATCH_PARENT));
+
+                webViewPop.setWebChromeClient(new WebChromeClient() {
+                    @Override
+                    public void onCloseWindow(WebView window) {
+                        frameLayout.removeView(window);
+                        frameLayout.setActivated(false);
+                        window.destroy();
+                    }
+                });
+
+                webViewPop.setWebViewClient(new WebViewClient(){
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                        String sUrl = request.getUrl().toString();
+                        Log.d(TAG, sUrl);
+
+                        if ( request.getUrl().getScheme().equals("intent") ) {
+                            try {
+                                Intent intent = Intent.parseUri(sUrl, Intent.URI_INTENT_SCHEME);
+
+                                if ( intent.resolveActivity(getPackageManager()) != null ) {
+                                    startActivity(intent);
+                                    Log.d(TAG, "ACTIVITY:" + intent.getPackage());
+                                    return true;
+                                }
+
+                                String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                                if ( fallbackUrl != null ) {
+                                    view.loadUrl(fallbackUrl);
+                                    Log.d(TAG, "FALLBACK:" + fallbackUrl);
+                                    return true;
+                                }
+
+                                Log.d(TAG, "Could not parse anythings");
+
+                            } catch (URISyntaxException e) {
+                                Log.e(TAG, "Invalid intent request", e);
+                            }
+                        }
+
+                        return false;
+                    }
+                });
+
+                frameLayout.addView(webViewPop);
+                frameLayout.setActivated(true);
+
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(webViewPop);
+                resultMsg.sendToTarget();
+
+                return true;
+            }
+        });
+
+        webView.loadUrl(URL);
+    }
+
+    /**
+     * <pre>
+     * WebView 뒤로가기 처리
+     *  - 참고/Android WebView 페이지 이동, 뒤로가기.txt 참고
+     * </pre>
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ( keyCode == KeyEvent.KEYCODE_BACK ) {
+            if ( frameLayout.isActivated() ) {
+                /*
+                    만약 팝업에 닫기 버튼 있는 경우,
+                    JavascriptInterface 이용해서 추가적으로 처리를 해줘야 한다고 한다.
+                */
+                webViewPop.loadUrl("javascript:window.close();");
+                return false;
+            }
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+    -----------------------------------------------------------------

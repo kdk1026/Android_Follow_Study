@@ -1,12 +1,12 @@
 Android 카카오맵 현재 위치
 --------------------------------------
     - Geolocation 사용하기
+    - 09. Android Webview 현재 위치 가져오기.txt 의 확장
 
     - minSdkVersion 26 / targetSdkVersion 30
 
 << HTML >>
     * 현재 위치로 카카오맵 띄우기
-        - 09. Android Webview 현재 위치 가져오기.txt 의 확장
     -----------------------------------------------------------------
     <!DOCTYPE html>
     <html lang="ko">
