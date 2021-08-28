@@ -1,5 +1,9 @@
 Android 현재 위치 가져오기
 ---------------------------
+    - 위치 (GPS)를 끄면 가져오지 못함
+    - OS 버전에 따라 다른가?
+        와이파이, 데이터를 끄고 실행해도 isNetworkEnabled-(location != null) 로그 찍어논 곳에서만 Location 반환        
+
     - minSdkVersion 26 / targetSdkVersion 30
 
 	* mainfests/AndroidManifest.xml
@@ -39,19 +43,17 @@ Android 현재 위치 가져오기
         private final Context mContext;
         private final Activity mActivity;
 
-        private Location location;
-
         private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
         private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
 
         public LocationService(Context mContext, Activity mActivity) {
             this.mContext = mContext;
             this.mActivity = mActivity;
-
-            this.getLocation();
         }
 
         public Location getLocation() {
+            Location location = null;
+
             try {
                 LocationManager locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
@@ -67,26 +69,41 @@ Android 현재 위치 가져오기
 
                     if ( hasFineLocationPermission != PackageManager.PERMISSION_GRANTED &&
                         hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED ) {
-
                         return null;
                     }
                 }
 
+                Log.d(TAG, "(locationManager != null) : " + (locationManager != null));
+                Log.d(TAG, "isNetworkEnabled : " + isNetworkEnabled);
+                Log.d(TAG, "isGPSEnabled : " + isGPSEnabled);
+
                 if ( isNetworkEnabled ) {
                     // LocationListener를 LocationManager에 등록
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, this.MIN_TIME_BW_UPDATES, this.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                            this.MIN_TIME_BW_UPDATES, this.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                     if ( locationManager != null ) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                        Log.d(TAG, "isNetworkEnabled-(location != null) : " + (location != null));
+                        if ( location != null ) {
+                            return location;
+                        }
                     }
                 }
 
                 if ( isGPSEnabled ) {
                     // LocationListener를 LocationManager에 등록
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, this.MIN_TIME_BW_UPDATES, this.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            this.MIN_TIME_BW_UPDATES, this.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                     if ( locationManager != null ) {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                        Log.d(TAG, "isGPSEnabled-(location != null) : " + (location != null));
+                        if ( location != null ) {
+                            return location;
+                        }
                     }
                 }
 
@@ -95,6 +112,14 @@ Android 현재 위치 가져오기
             }
 
             return location;
+        }
+
+        public void stopUsingGPS() {
+            LocationManager locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+            if ( locationManager != null ) {
+                locationManager.removeUpdates(this);
+            }
         }
 
         @Nullable
@@ -130,7 +155,7 @@ Android 현재 위치 가져오기
     -----------------------------------------------------------------
     private static final String TAG = "***MainActivity";
 
-    public static final int PERMISSIONS_REQUEST = 3;
+    public static final int GPS_ENABLE_REQUEST_CODE = 3;
 
     private LocationService locationService;
 
@@ -145,7 +170,13 @@ Android 현재 위치 가져오기
 
         Location location = locationService.getLocation();
 
+        Log.d(TAG, "location null check1 : " + (location == null));
+        Log.d(TAG, "location null check2 : " + (location != null));
+
         if ( location != null ) {
+            Log.d(TAG, "location getLatitude : " + location.getLatitude());
+            Log.d(TAG, "location getLongitude : " + location.getLongitude());
+
             TextView text_latitude = findViewById(R.id.text_latitude);
             String sLatitude = text_latitude.getText().toString() + location.getLatitude();
             text_latitude.setText(sLatitude);
@@ -163,7 +194,7 @@ Android 현재 위치 가져오기
             if ( !ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) ) {
                 ActivityCompat.requestPermissions(this,
-                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST);
+                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
             }
         }
     }
@@ -173,7 +204,7 @@ Android 현재 위치 가져오기
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case PERMISSIONS_REQUEST: {
+            case GPS_ENABLE_REQUEST_CODE: {
                 if ( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 설정 되었습니다. 앱을 재실행합니다.", Toast.LENGTH_LONG).show();
 
