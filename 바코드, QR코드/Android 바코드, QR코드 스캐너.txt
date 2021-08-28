@@ -1,5 +1,5 @@
-Android 바코드 스캐너
----------------------
+Android 바코드, QR코드 스캐너
+----------------------------
     - minSdkVersion 26 / targetSdkVersion 30
 
     - 바코드 생성
