@@ -1,0 +1,109 @@
+Android 현재 주소 가져오기
+--------------------------
+    - Android 현재 위치 가져오기.txt 이후, 추가 기능
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+     * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <TextView
+        android:id="@+id/text_addr"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:text="주소 : "
+        android:autoSizeTextType="uniform"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/util/AddressUtil.java
+    -----------------------------------------------------------------
+    위치 정보/유틸/AddressUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+    -----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    public static final int GPS_ENABLE_REQUEST_CODE = 3;
+
+    private LocationService locationService;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.checkPermission( getApplicationContext() );
+
+        locationService = new LocationService( getApplicationContext() );
+
+        Location location = locationService.getLocation();
+
+        Log.d(TAG, "(location == null) : " + (location == null));
+
+        if ( location != null ) {
+            Log.d(TAG, "location getLatitude : " + location.getLatitude());
+            Log.d(TAG, "location getLongitude : " + location.getLongitude());
+
+            String sAddr = AddressUtil.getInstance().getCurrentAddress(this,
+                    location.getLatitude(), location.getLongitude());
+
+            TextView text_addr = findViewById(R.id.text_addr);
+            text_addr.setText(text_addr.getText() + sAddr);
+        }
+    }
+
+    private void checkPermission(Context context) {
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if ( !ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) ) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case GPS_ENABLE_REQUEST_CODE: {
+                if ( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 설정 되었습니다. 앱을 재실행합니다.", Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(2000);
+
+                        /*
+                            재실행 안하면 다음과 같은 에러 발생 (Logcat Error)
+                                - The application does not have sufficient geolocation permissions
+                         */
+                        FinishRestartUtil.getInstance().restart( getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "앱 실행을 위한 권한이 취소 되었습니다.", Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(2000);
+
+                        FinishRestartUtil.getInstance().completelyExit( this, getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+        }
+    }
+    -----------------------------------------------------------------
