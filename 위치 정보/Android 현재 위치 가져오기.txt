@@ -41,14 +41,12 @@ Android 현재 위치 가져오기
         private static final String TAG = "***LocationService";
 
         private final Context mContext;
-        private final Activity mActivity;
 
         private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
         private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
 
-        public LocationService(Context mContext, Activity mActivity) {
+        public LocationService(Context mContext) {
             this.mContext = mContext;
-            this.mActivity = mActivity;
         }
 
         public Location getLocation() {
@@ -166,7 +164,7 @@ Android 현재 위치 가져오기
 
         this.checkPermission( getApplicationContext() );
 
-        locationService = new LocationService( getApplicationContext(), this );
+        locationService = new LocationService( getApplicationContext() );
 
         Location location = locationService.getLocation();
 
