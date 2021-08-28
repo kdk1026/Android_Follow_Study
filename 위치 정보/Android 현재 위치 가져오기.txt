@@ -168,8 +168,7 @@ Android 현재 위치 가져오기
 
         Location location = locationService.getLocation();
 
-        Log.d(TAG, "location null check1 : " + (location == null));
-        Log.d(TAG, "location null check2 : " + (location != null));
+        Log.d(TAG, "(location == null) : " + (location == null));
 
         if ( location != null ) {
             Log.d(TAG, "location getLatitude : " + location.getLatitude());
