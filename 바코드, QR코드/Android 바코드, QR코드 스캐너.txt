@@ -10,6 +10,9 @@ Android 바코드, QR코드 스캐너
         [사이트]    https://ko.online-qrcode-generator.com/
         [직접 생성] https://github.com/davidshimjs/qrcodejs
 
+    - 카메라 권한은 명시하지 않아도 앱 실행 시, 권한 팝업 뜸
+        > 라이브러리에서 처리하나봄
+
     * app/build.gradle
     -----------------------------------------------------------------
     // https://mvnrepository.com/artifact/com.journeyapps/zxing-android-embedded
