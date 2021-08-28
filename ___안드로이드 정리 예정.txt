@@ -16,9 +16,6 @@ https://javapp.tistory.com/110?category=348168
 			https://www.itsalif.info/content/android-volley-tutorial-http-get-post-put
 
 		[기타] 
-			QR코드 읽기
-				https://everyshare.tistory.com/51
-
 			App to App 데이터 전달 (앱간 데이터 전달)
 				https://202psj.tistory.com/1620
 
