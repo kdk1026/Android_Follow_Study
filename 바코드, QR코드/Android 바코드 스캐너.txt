@@ -1,0 +1,95 @@
+Android 바코드 스캐너
+---------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    - 바코드 생성
+        <사이트>
+            https://barcode.tec-it.com/en/
+
+        <직접 생성>
+            https://barcode-coder.com/en/barcode-jquery-plugin-201.html
+
+    * app/build.gradle
+    -----------------------------------------------------------------
+    // https://mvnrepository.com/artifact/com.journeyapps/zxing-android-embedded
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+    -----------------------------------------------------------------
+        - https://github.com/journeyapps/zxing-android-embedded
+
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.example.testapp">
+
+        ...
+	-----------------------------------------------------------------
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    ...
+
+        <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+
+    </manifest>
+	-----------------------------------------------------------------
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <application
+        ...
+        android:hardwareAccelerated="true">
+	-----------------------------------------------------------------
+
+    * src/main/java/com/example/testapp/MainActivity.java
+    -----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.changeScanActivity(this);
+    }
+
+    private void changeScanActivity(Activity activity) {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setOrientationLocked(false);
+        integrator.setPrompt("바코드 및 QR코드 등록을 위해\n상자안에 위치시켜 주세요.\n\n");
+        integrator.initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        
+        if (result != null) {
+            if ( result.getContents() == null ) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                // result.getContents 를 이용 데이터 재가공
+                Toast.makeText(this, "Scanned: "+ result.getContents(), Toast.LENGTH_LONG).show();
+            }
+
+            this.changeScanActivity(this);
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+    -----------------------------------------------------------------
+
+<< 세로 모드 희망하는 경우 >>
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    ...
+        <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation">
+
+        </activity>
+
+    </application>
+	-----------------------------------------------------------------
