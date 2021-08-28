@@ -19,9 +19,6 @@ https://javapp.tistory.com/110?category=348168
 			App to App 데이터 전달 (앱간 데이터 전달)
 				https://202psj.tistory.com/1620
 
-			중복클릭 막기
-				https://thegichul.tistory.com/249
-
 	- 호기심...
 		AR 예제 구현하기? 재미있을거 같은데...
 			예제가 코틀린이라 매칭 자바 코드 찾아봐야 하나...
