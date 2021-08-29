@@ -1,0 +1,71 @@
+Android Webvew 확대,축소
+-------------------------
+    - 일반적으로 허용하지 않는 추세인 듯
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+<< HTML >>
+    - viewport에 옵션 추가
+        maximum-scale=2.0, minimum-scale=1.0
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=2.0, minimum-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        
+        <div>viewport에 옵션 추가로 웹뷰에서 확대/축소</div>
+
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	-----------------------------------------------------------------
+
+     * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/util/WebViewSettingUtil.java
+        - webSettings.setBuiltInZoomControls(true);
+    -----------------------------------------------------------------
+    04. 웹뷰/유틸/WebViewSettingUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/MainActivity.java
+    -----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient());
+
+        webView.loadUrl("https://test-a9f7e.web.app/zoom.html");
+    }
+    -----------------------------------------------------------------
