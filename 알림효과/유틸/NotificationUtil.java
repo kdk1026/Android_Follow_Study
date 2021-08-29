@@ -21,10 +21,11 @@ import androidx.core.app.NotificationManagerCompat;
  * <pre>
  * 알림바 유틸
  *  - 채널 ID/명, 아이콘 이미지만 변경해서 사용 가능할 듯
+ *  - 진동 무음의 경우, 데이터 삭제가 아닌 앱을 완전히 새로 설치한 경우에만 적용
  * </pre>
  *
  * @author 김대광
- * @Description	: minSdkVersion 26 / targetSdkVersion 30
+ * @Description : minSdkVersion 26 / targetSdkVersion 30
  */
 public class NotificationUtil {
 
@@ -58,10 +59,12 @@ public class NotificationUtil {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
 
-            if ( !vibration ) {
-                channel.setVibrationPattern(new long[]{0}); // 진동 무음
-                channel.enableVibration(true); // 진동 무음
+            if (!vibration) {
+                channel.setVibrationPattern(new long[] { 0 }); // 진동 무음
+            } else {
+                channel.setVibrationPattern(new long[] { 100, 200 });
             }
+            channel.enableVibration(true);
 
             notificationManager.createNotificationChannel(channel);
         }
@@ -73,9 +76,7 @@ public class NotificationUtil {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.context);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this.context, CHANNEL_ID);
 
-        builder.setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(title)
-                .setContentText(content)
+        builder.setSmallIcon(R.drawable.ic_launcher_background).setContentTitle(title).setContentText(content)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         Notification notification = builder.build();
@@ -87,7 +88,7 @@ public class NotificationUtil {
 
         notificationManager.cancel(notifyId);
 
-        if ( cancelAll ) {
+        if (cancelAll) {
             notificationManager.cancelAll();
         }
     }
