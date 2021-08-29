@@ -1,4 +1,4 @@
-04. Android Webview JavascriptInterface
+03. Android Webview JavascriptInterface
 ----------------------------------------
 	- Javascript와 App간에 메시지 주고 받기
 	- minSdkVersion 26 / targetSdkVersion 30 : WebView, Button 위치? 외에는 일단 4년 전과 동일
