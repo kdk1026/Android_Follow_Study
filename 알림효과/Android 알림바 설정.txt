@@ -1,0 +1,72 @@
+Android 알림바 설정
+--------------------
+    - 푸시 구현이 되어 있지 않은 경우 활용? (푸시가 되어 있으면 굳이 이렇게 할 필요는 없을 듯...)
+    
+        1)  [Web]       BO 에서 등록 > 로그인 권한 없는 JavaScript 인터페이스 되어 있는 FO 띄움
+            [Androd]    수신 받고 알림바 띄움
+
+        2)  [Web]       사전 정의된 JavaScript 인터페이스 Bridge로 페이지 구현 > 배포 > 서버 재시작 > 구현 페이지 띄움
+            [Androd]    수신 받고 알림바 띄움
+
+    - 알림 중지는 딱히 쓸일이 없을 거 같기는 하다...
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+	* src/main/res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <Button
+        android:id="@+id/btnMake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:text="알림 생성"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:text="알림 중지"
+        app:layout_constraintStart_toEndOf="@+id/btnMake"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/util/NotificationUtil.java
+    -----------------------------------------------------------------
+    알림효과/유틸/NotificationUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/MainActivity.java
+    -----------------------------------------------------------------
+    private static final int NOTIFY_ID = 1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        final Button btnMake = findViewById(R.id.btnMake);
+        btnMake.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String sTitle = "[공지] 시스템 점검 안내";
+                String sContent = "8/29(일) 21:00 ~ 8/30(월) 09:00";
+
+                NotificationUtil.getInstance().setContext( getApplicationContext() );
+                NotificationUtil.getInstance().makeNotify(false, NOTIFY_ID, sTitle, sContent);
+            }
+        });
+
+        final Button btnStop = findViewById(R.id.btnStop);
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotificationUtil.getInstance().stopNotify(NOTIFY_ID, false);
+            }
+        });
+    }
+    -----------------------------------------------------------------
