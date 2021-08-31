@@ -1,0 +1,40 @@
+Android Webview GoogleDrive 인쇄, 다운로드 숨기기
+------------------------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+    - 05. Android Webview File Download.txt 참고
+
+ 	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.setWebChromeClient(new WebChromeClient());
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // 옘병할 도저히 모르겠다!!! 웹뷰에서 인쇄, 다운로드 하지마 보는걸로 만족하도록
+                webView.loadUrl("javascript:(function() { " + "document.getElementsByClassName('ndfHFb-c4YZDc-to915-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe VIpgJd-TzA9Ye-eEGnhe ndfHFb-c4YZDc-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe-SfQLQb-Bz112c')[0].style.display='none';})()");
+                webView.loadUrl("javascript:(function() { " + "document.getElementsByClassName('ndfHFb-c4YZDc-to915-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe VIpgJd-TzA9Ye-eEGnhe ndfHFb-c4YZDc-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe-SfQLQb-Bz112c')[1].style.display='none';})()");
+                super.onPageFinished(view, url);
+            }
+        });
+
+        webView.setDownloadListener(new MyDownloadListenerImpl());
+
+        webView.loadUrl("https://test-a9f7e.web.app/download.html");
+    }
+    -----------------------------------------------------------------

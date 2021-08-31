@@ -47,7 +47,6 @@
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            contentDisposition = contentDisposition.substring(0, contentDisposition.lastIndexOf(";"));
             request.setMimeType(mimetype);
 
             String sCookies = CookieManager.getInstance().getCookie(url);
