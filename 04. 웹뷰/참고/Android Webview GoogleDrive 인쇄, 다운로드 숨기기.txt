@@ -33,6 +33,10 @@ Android Webview GoogleDrive 인쇄, 다운로드 숨기기
                     // 옘병할 도저히 모르겠다!!! 웹뷰에서 인쇄, 다운로드 하지마 보는걸로 만족하도록
                     webView.loadUrl("javascript:(function() { " + "document.getElementsByClassName('ndfHFb-c4YZDc-to915-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe VIpgJd-TzA9Ye-eEGnhe ndfHFb-c4YZDc-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe-SfQLQb-Bz112c')[0].style.display='none';})()");
                     webView.loadUrl("javascript:(function() { " + "document.getElementsByClassName('ndfHFb-c4YZDc-to915-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe VIpgJd-TzA9Ye-eEGnhe ndfHFb-c4YZDc-LgbsSe ndfHFb-c4YZDc-C7uZwb-LgbsSe-SfQLQb-Bz112c')[1].style.display='none';})()");
+
+                    Toast.makeText(getApplicationContext(), "번거롭겠지만\n인쇄 및 다운로드를 원하시면 브라우저를 이용해주세요~\n양해 부탁드립니다~", Toast.LENGTH_LONG).show();
+
+                    view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                 }
 
                 super.onPageFinished(view, url);
