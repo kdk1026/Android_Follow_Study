@@ -3,6 +3,7 @@ Android Webview GoogleDrive 인쇄, 다운로드 숨기기
     - minSdkVersion 26 / targetSdkVersion 30
 
     - 05. Android Webview File Download.txt 참고
+        > DownloadListener 로 진입 자체를 안함
 
  	* /java/패키지 경로/MainActivity
 	-----------------------------------------------------------------
