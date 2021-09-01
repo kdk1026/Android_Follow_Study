@@ -33,6 +33,11 @@ Androd WebView 카메라-사진 및 갤러리 업로드
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 	-----------------------------------------------------------------
 
+    * src/main/java/com/example/mytest/util/WebViewCameraUtil.java
+    -----------------------------------------------------------------
+    04. 웹뷰/유틸/WebViewCameraUtil.java
+    -----------------------------------------------------------------
+
     * src/main/java/com/example/mytest/MainActivity.java
     -----------------------------------------------------------------
     private static final String TAG = "***MainActivity";
@@ -69,8 +74,37 @@ Androd WebView 카메라-사진 및 갤러리 업로드
                 }
                 filePathCallbackLollipop = filePathCallback;
 
+                String acceptType = fileChooserParams.getAcceptTypes()[0];
                 boolean isCapture = fileChooserParams.isCaptureEnabled();
-                runCamera(isCapture);
+                
+                Log.d(TAG, "fileChooserParams - acceptType : " + acceptType);
+                Log.d(TAG, "fileChooserParams - isCapture : " + isCapture);
+
+                if ( "image/*".equals(acceptType) ) {
+                    WebViewCameraUtil.getInstance().setContext( getApplicationContext() );
+                    cameraImageUri = WebViewCameraUtil.getInstance().runCameraImage( isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                } else {
+                    // TODO : video/*, audio/*
+
+                    String sMsg = "준비중입니다~ 쉬운게 아니에요~\n다시 누르면 죽으니까 강제로 죽일게요~^^ 즐~";
+                    Toast.makeText(getApplicationContext(), sMsg, Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(1000);
+
+                        FinishRestartUtil.getInstance().completelyExit( MainActivity.this, getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    /*
+                        return false 안하면 다른 기능도 반응이 없음
+                        java.lang.IllegalStateException: Duplicate showFileChooser result
+                     */
+                    return false;
+                }
+
                 return true;
             }
         });
@@ -78,57 +112,6 @@ Androd WebView 카메라-사진 및 갤러리 업로드
         webView.setWebViewClient(new WebViewClient());
 
         webView.loadUrl("https://test-a9f7e.web.app/mobile_etc.html");
-    }
-
-    private void runCamera(boolean isCapture) {
-        Log.d(TAG, "runCamera - isCapture : " + isCapture);
-
-        if ( !isCapture ) {
-            // // 선택 팝업 : 갤러리, 포토 띄우기
-            Intent pickIntent = new Intent(Intent.ACTION_PICK);
-            pickIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-            pickIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-            String pickTitle = "사진 가져올 방법을 선택하세요.";
-            Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
-
-            // FIXME : deprecated ...
-            startActivityForResult(chooserIntent, FILECHOOSER_LOLLIPOP_REQ_CODE);
-            return;
-        }
-
-        Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        File path = Environment.getExternalStorageDirectory();
-        File file = new File(path, "sample.png");
-
-        // File 객체의 URI를 얻는다.
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ) {
-            String providerAuthorities = getApplicationContext().getPackageName() + ".provider";
-
-            cameraImageUri = FileProvider.getUriForFile(this, providerAuthorities, file);
-        } else {
-            cameraImageUri = Uri.fromFile(file);
-        }
-        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
-
-        if ( !isCapture ) {
-            // 선택 팝업 : 카메라, 갤러리, 포토
-            Intent pickIntent = new Intent(Intent.ACTION_PICK);
-            pickIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-            pickIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-            String pickTitle = "사진 가져올 방법을 선택하세요.";
-            Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
-
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[]{intentCamera});
-
-            // FIXME : deprecated ...
-            startActivityForResult(chooserIntent, FILECHOOSER_LOLLIPOP_REQ_CODE);
-        } else {
-            // FIXME : deprecated ...
-            startActivityForResult(intentCamera, FILECHOOSER_LOLLIPOP_REQ_CODE);
-        }
     }
 
     @Override
@@ -144,7 +127,7 @@ Androd WebView 카메라-사진 및 갤러리 업로드
                         data.setData(cameraImageUri);
                     }
 
-                    Log.d(TAG, "cameraImageUri" + cameraImageUri);
+                    Log.d(TAG, "cameraImageUri : " + cameraImageUri);
 
                     filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                     filePathCallbackLollipop = null;
