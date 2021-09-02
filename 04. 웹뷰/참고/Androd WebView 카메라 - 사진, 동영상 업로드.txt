@@ -144,6 +144,7 @@ Androd WebView 카메라 - 사진, 동영상 업로드
                         break;
                     case "video/*":
                         cameraImageUri = WebViewCameraUtil.getInstance().runCameraVideo(isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                        break;
                     default:
                         break;
                 }
