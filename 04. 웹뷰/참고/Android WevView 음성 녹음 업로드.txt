@@ -1,0 +1,208 @@
+Android WevView 음성 녹음 업로드
+--------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
+
+<< HTML >>
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+
+        <div>
+            <div>
+                <div>오디오</div>
+                <input type="file" name="audioFile" id="audioFile" accept="audio/*" capture="microphone" />
+                <audio src="" controls="true" id="mAudio"></audio>
+            </div>
+        </div>
+
+        <script>
+            window.addEventListener('load', function(){
+                document.querySelector('#audioFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mAudio').setAttribute("src", fileUrl);
+                });
+            });
+        </script>
+
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
+    * src/main/res/xml/file_paths.xml
+    -----------------------------------------------------------------
+    <?xml version="1.0" encoding="utf-8"?>
+    <paths xmlns:android="http://schemas.android.com/apk/res/android">
+        <external-path
+            name="external_files"
+            path="." />
+    </paths>
+    -----------------------------------------------------------------
+
+	* mainfests/AndroidManifest.xml
+	-----------------------------------------------------------------
+    ...
+        <provider
+            android:authorities="${applicationId}.provider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+    </application>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- Android 11 -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+	-----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/util/WebViewCameraUtil.java
+    -----------------------------------------------------------------
+    04. 웹뷰/유틸/WebViewCameraUtil.java
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/MainActivity.java
+    -----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    private WebView webView;
+    private WebSettings webSettings;
+
+    public ValueCallback<Uri[]> filePathCallbackLollipop;
+    public final static int FILECHOOSER_LOLLIPOP_REQ_CODE = 2002;
+    private Uri audioImageUri = null;
+
+    public static final int CAMERA_ENABLE_REQUEST_CODE = 1;
+    public static final int EXTERNAL_STORAGE_ENABLE_REQUEST_CODE = 2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.checkPermission( getApplicationContext() );
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                // Callback 초기화
+                if ( filePathCallbackLollipop != null ) {
+                    filePathCallbackLollipop.onReceiveValue(null);
+                    filePathCallbackLollipop = null;
+                }
+                filePathCallbackLollipop = filePathCallback;
+
+                String acceptType = fileChooserParams.getAcceptTypes()[0];
+                boolean isCapture = fileChooserParams.isCaptureEnabled();
+                
+                Log.d(TAG, "fileChooserParams - acceptType : " + acceptType);
+                Log.d(TAG, "fileChooserParams - isCapture : " + isCapture);
+
+                switch (acceptType) {
+                    case "audio/*":
+                        Intent intentSpeech = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+
+                        File path = Environment.getExternalStorageDirectory();
+                        File file = new File(path, "sample.m4a");
+
+                        // File 객체의 URI를 얻는다.
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            String providerAuthorities = getApplication().getPackageName() + ".provider";
+
+                            audioImageUri = FileProvider.getUriForFile(getApplicationContext(), providerAuthorities, file);
+                        } else {
+                            audioImageUri = Uri.fromFile(file);
+                        }
+                        intentSpeech.putExtra(MediaStore.EXTRA_OUTPUT, audioImageUri);
+
+                        // FIXME : deprecated ...
+                        startActivityForResult(intentSpeech, FILECHOOSER_LOLLIPOP_REQ_CODE);
+                        break;
+                    default:
+                        break;
+                }
+
+                return true;
+            }
+        });
+
+        webView.setWebViewClient(new WebViewClient());
+
+        webView.loadUrl("https://test-a9f7e.web.app/mobile_etc.html");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case FILECHOOSER_LOLLIPOP_REQ_CODE:
+                if ( resultCode == RESULT_OK ) {
+                    if ( filePathCallbackLollipop == null ) return;
+                    if ( data == null ) {
+                        data = new Intent();
+                    }
+                    if ( data.getData() == null ) {
+                        data.setData(audioImageUri);
+                    }
+
+                    Log.d(TAG, "audioImageUri : " + audioImageUri);
+
+                    filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                    filePathCallbackLollipop = null;
+                } else {
+                    if ( filePathCallbackLollipop != null ) {
+                        filePathCallbackLollipop.onReceiveValue(null);
+                        filePathCallbackLollipop = null;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void checkPermission(Context context) {
+        FileUtil.getExternalInstance().checkPermission(getApplicationContext(), this, EXTERNAL_STORAGE_ENABLE_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.R ) {
+            // below Android 11
+            if ( requestCode == EXTERNAL_STORAGE_ENABLE_REQUEST_CODE ) {
+                if ( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "앱 실행을 위한 저장공간 권한이 설정 되었습니다.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "앱 실행을 위한 저장공간 권한이 취소 되었습니다.", Toast.LENGTH_LONG).show();
+
+                    try {
+                        Thread.sleep(2000);
+
+                        FinishRestartUtil.getInstance().completelyExit( this, getApplicationContext() );
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+    -----------------------------------------------------------------
