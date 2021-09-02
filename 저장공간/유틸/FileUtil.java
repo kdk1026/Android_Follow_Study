@@ -1,4 +1,4 @@
-package com.example.testapp.util;
+package com.example.mytest.util;
 
 import android.Manifest;
 import android.app.Activity;
@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat;
  * 개정이력
  * -----------------------------------
  * 2021. 8. 22. 김대광	최초 작성
+ * 2021. 9. 02. 김대광  퍼미션 관련 수정
  * </pre>
  *
  * <pre>
@@ -63,19 +64,18 @@ public class FileUtil {
      * 외부 저장소
      */
     public static class External {
-        public static final int PERMISSIONS_REQUEST = 1;
-
         /**
          * <pre>
          * 권한 팝업 요청
          *      - Android 11 권한 설정 화면 전환
          *      - below Android 11 권한 팝업 요청
          * </pre>
-         * 
+         *
          * @param context
          * @param activity
+         * @param externalStorageEnableRequestCode
          */
-        public void checkPermission(Context context, Activity activity) {
+        public void checkPermission(Context context, Activity activity, int externalStorageEnableRequestCode) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 // Android 11
                 if (!Environment.isExternalStorageManager()) {
@@ -94,22 +94,22 @@ public class FileUtil {
 
                     String[] permissions = { Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.READ_EXTERNAL_STORAGE };
-                    ActivityCompat.requestPermissions(activity, permissions, PERMISSIONS_REQUEST);
+                    ActivityCompat.requestPermissions(activity, permissions, externalStorageEnableRequestCode);
                 }
             }
         }
 
         /**
          * 외부 저장소 파일
-         * 
+         *
          * @param filePath
          * @param hasPermission
          * @param environmentDirectory
-         * 
+         *
          *                             <pre>
          *      : Environment.DIRECTORY_ALARMS ~ Environment.DIRECTORY_MUSIC
          *                             </pre>
-         * 
+         *
          * @return
          */
         public File getExternalFile(String filePath, boolean hasPermission, String environmentDirectory) {
@@ -127,7 +127,7 @@ public class FileUtil {
 
         /**
          * 폴더 생성
-         * 
+         *
          * @param dir
          * @return
          */
@@ -145,7 +145,7 @@ public class FileUtil {
 
         /**
          * 텍스트 내용을 해당 경로에 파일로 생성
-         * 
+         *
          * @param file
          * @param text
          */
@@ -177,7 +177,7 @@ public class FileUtil {
 
         /**
          * 파일을 문자열로 읽음
-         * 
+         *
          * @param file
          * @return
          */
@@ -222,7 +222,7 @@ public class FileUtil {
          * 파일 삭제
          *  - 폴더안의 파일들을 제거한 뒤 대상 폴더제거
          * </pre>
-         * 
+         *
          * @param filePath
          * @param hasPermission
          * @param environmentDirectory
@@ -261,7 +261,7 @@ public class FileUtil {
     public static class Inner {
         /**
          * 내부 저장소 경로 가져오기
-         * 
+         *
          * @param context
          * @return
          */
@@ -271,7 +271,7 @@ public class FileUtil {
 
         /**
          * 파일 경로 가져오기
-         * 
+         *
          * @param context
          * @param fileNm
          * @return
@@ -282,7 +282,7 @@ public class FileUtil {
 
         /**
          * 텍스트 내용을 파일로 생성
-         * 
+         *
          * @param context
          * @param fileNm
          * @param text
@@ -301,7 +301,7 @@ public class FileUtil {
 
         /**
          * 파일을 문자열로 읽음
-         * 
+         *
          * @param context
          * @param fileNm
          * @return
@@ -326,7 +326,7 @@ public class FileUtil {
 
         /**
          * 파일 삭제
-         * 
+         *
          * @param context
          * @param fileNm
          * @return
