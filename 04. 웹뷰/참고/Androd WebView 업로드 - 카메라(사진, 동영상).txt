@@ -1,4 +1,4 @@
-Androd WebView 카메라 - 사진, 동영상 업로드
+Androd WebView 업로드 - 카메라(사진, 동영상)
 ------------------------------------------
     - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
 
