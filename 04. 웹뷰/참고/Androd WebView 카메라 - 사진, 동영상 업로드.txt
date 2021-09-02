@@ -1,4 +1,4 @@
-Androd WebView 카메라-사진 및 갤러리 업로드
+Androd WebView 카메라 - 사진, 동영상 업로드
 ------------------------------------------
     - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
 
@@ -25,6 +25,11 @@ Androd WebView 카메라-사진 및 갤러리 업로드
                 <input type="file" name="mFile" id="mFile" accept="image/*" />
                 <img src="https://placeimg.com/200/200/any" alt="테스트 이미지" id="mImg2" style="width: 200px; height: 200px;" />
             </div>
+            <div>
+                <div>카메라 (동영상)</div>
+                <input type="file" name="videoFile" id="videoFile" accept="video/*" capture="camcorder" />
+                <video src="" controls="true" id="mVideo" style="width: 200px; height: 200px;"></video>
+            </div>
         </div>
 
         <script>
@@ -39,6 +44,11 @@ Androd WebView 카메라-사진 및 갤러리 업로드
                     document.querySelector('#mImg2').setAttribute("src", fileUrl);
 
                     // 웹뷰도 할려고 하면 모바일 웹이랑 동일하게 맞출 수 있을거 같기는 하지만....
+                });
+
+                document.querySelector('#videoFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mVideo').setAttribute("src", fileUrl);
                 });
             });
         </script>
@@ -126,29 +136,16 @@ Androd WebView 카메라-사진 및 갤러리 업로드
                 Log.d(TAG, "fileChooserParams - acceptType : " + acceptType);
                 Log.d(TAG, "fileChooserParams - isCapture : " + isCapture);
 
-                if ( "image/*".equals(acceptType) ) {
-                    WebViewCameraUtil.getInstance().setContext( getApplicationContext() );
-                    cameraImageUri = WebViewCameraUtil.getInstance().runCameraImage( isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
-                } else {
-                    // TODO : video/*, audio/*
+                WebViewCameraUtil.getInstance().setContext( getApplicationContext() );
 
-                    String sMsg = "준비중입니다~ 쉬운게 아니에요~\n다시 누르면 죽으니까 강제로 죽일게요~^^ 즐~";
-                    Toast.makeText(getApplicationContext(), sMsg, Toast.LENGTH_LONG).show();
-
-                    try {
-                        Thread.sleep(1000);
-
-                        FinishRestartUtil.getInstance().completelyExit( MainActivity.this, getApplicationContext() );
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    /*
-                        return false 안하면 다른 기능도 반응이 없음
-                        java.lang.IllegalStateException: Duplicate showFileChooser result
-                     */
-                    return false;
+                switch (acceptType) {
+                    case "image/*":
+                        cameraImageUri = WebViewCameraUtil.getInstance().runCameraImage( isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                        break;
+                    case "video/*":
+                        cameraImageUri = WebViewCameraUtil.getInstance().runCameraVideo(isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                    default:
+                        break;
                 }
 
                 return true;
