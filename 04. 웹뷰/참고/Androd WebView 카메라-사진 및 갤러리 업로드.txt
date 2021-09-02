@@ -2,6 +2,52 @@ Androd WebView 카메라-사진 및 갤러리 업로드
 ------------------------------------------
     - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
 
+<< HTML >>
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+
+        <div>
+            <div>
+                <div>카메라 (사진)</div>
+                <input type="file" name="imgFile" id="imgFile" accept="image/*" capture="camera" />
+                <img src="https://placeimg.com/200/200/any" alt="테스트 이미지" id="mImg" style="width: 200px; height: 200px;" />
+            </div>
+            <div>
+                <div>카메라 | 내 파일 | 파일</div>
+                <input type="file" name="mFile" id="mFile" accept="image/*" />
+                <img src="https://placeimg.com/200/200/any" alt="테스트 이미지" id="mImg2" style="width: 200px; height: 200px;" />
+            </div>
+        </div>
+
+        <script>
+            window.addEventListener('load', function(){
+                document.querySelector('#imgFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mImg').setAttribute("src", fileUrl);
+                });
+
+                document.querySelector('#mFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mImg2').setAttribute("src", fileUrl);
+
+                    // 웹뷰도 할려고 하면 모바일 웹이랑 동일하게 맞출 수 있을거 같기는 하지만....
+                });
+            });
+        </script>
+
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
     * src/main/res/xml/file_paths.xml
     -----------------------------------------------------------------
     <?xml version="1.0" encoding="utf-8"?>
