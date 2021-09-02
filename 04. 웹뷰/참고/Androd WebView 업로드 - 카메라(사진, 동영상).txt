@@ -190,6 +190,8 @@ Androd WebView 업로드 - 카메라(사진, 동영상)
     }
 
     public void checkPermission(Context context) {
+        // 저장공간/유틸/FileUtil.java
+        
         FileUtil.getExternalInstance().checkPermission(getApplicationContext(), this, EXTERNAL_STORAGE_ENABLE_REQUEST_CODE);
 
         if ( ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ) {
