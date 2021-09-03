@@ -1,6 +1,6 @@
 03. Android 갤러리, 음성인식
 ----------------------------
-    - minSdkVersion 26 / targetSdkVersion 30
+    - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
 
     * src/main/res/layout/activity_main.xml
 	-----------------------------------------------------------------
@@ -44,9 +44,6 @@
 	-----------------------------------------------------------------
     private static final String TAG = "***MainActivity";
 
-    private static final int MEDIA_TYPE_IMAGE = 30;
-    private static final int MEDIA_TYPE_SPEECH = 50;
-
     private ImageView imageView;
 
     @Override
@@ -68,36 +65,23 @@
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, MEDIA_TYPE_IMAGE);
-
-                /*
-                    // TODO : Android 카메라.txt 상동
-                 */
+                galleryResult.launch(intent);
             }
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if ( resultCode == RESULT_OK ) {
-            if ( requestCode == MEDIA_TYPE_IMAGE ) {
-                Log.d(TAG, "onActivityResult : " + data.getDataString());
-                imageView.setImageURI(Uri.parse(data.getDataString()) );
+    ActivityResultLauncher<Intent> galleryResult = registerForActivityResult(
+            new  ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Log.d(TAG, "onActivityResult : " + result.getData().getDataString());
+                        imageView.setImageURI(Uri.parse(result.getData().getDataString()) );
+                    }
+                }
             }
-
-            if ( requestCode == MEDIA_TYPE_SPEECH ) {
-                List<String> resultList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-
-                Log.d(TAG, "onActivityResult : " + resultList);
-                Log.d(TAG, "onActivityResult.get(0) : " + resultList.get(0));
-
-                TextView textView = findViewById(R.id.textView);
-                textView.setText(resultList.get(0));
-            }
-        }
-    }
+    );
 
     private void processSpeech() {
         Button btnSpeech = findViewById(R.id.btnSpeech);
@@ -108,8 +92,26 @@
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                         RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                 intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "음성인식 테스트");
-                startActivityForResult(intent, MEDIA_TYPE_SPEECH);
+                speechResult.launch(intent);
             }
         });
     }
+
+    ActivityResultLauncher<Intent> speechResult = registerForActivityResult(
+            new  ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        List<String> resultList = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                        Log.d(TAG, "onActivityResult : " + resultList);
+                        Log.d(TAG, "onActivityResult.get(0) : " + resultList.get(0));
+
+                        TextView textView = findViewById(R.id.textView);
+                        textView.setText(resultList.get(0));
+                    }
+                }
+            }
+    );
     -----------------------------------------------------------------
