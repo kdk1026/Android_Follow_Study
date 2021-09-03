@@ -51,41 +51,27 @@ Android 주소록, 전화
         btnContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
+                Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                 intent.setData(ContactsContract.Contacts.CONTENT_URI);
-                startActivityForResult(intent, 10);
-
-                /*
-                    // https://bacassf.tistory.com/104
-                    
-                    // TODO : deprecated 되었건만... 어쩔 수가 없다... 아오!! 힘들게 찾았드만 에러가 아주!!!
-                 */
-//                ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
-//                    new  ActivityResultContracts.StartActivityForResult(),
-//                    new ActivityResultCallback<ActivityResult>() {
-//                        @Override
-//                        public void onActivityResult(ActivityResult result) {
-//                            Log.d(TAG, "MainActivity로 돌아왔다. ");
-//                        }
-//                });
-//                startActivityResult.launch(intent);
+                startActivityResult.launch(intent);
             }
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if ( requestCode==10 && resultCode==RESULT_OK ) {
-            String sResult = data.getDataString();
-            Log.d(TAG, "선택한 결과 : " + sResult);
+    ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
+            new  ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Log.d(TAG, "선택한 결과 : " + result.getData().getDataString());
 
-            // 상세보기 화면 띄우기
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(sResult));
-            startActivity(intent);
-        }
-    }
+                    // 상세보기 화면 띄우기
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(result.getData().getDataString()));
+                    startActivity(intent);
+                }
+            }
+    );
 
     private void processCallPhone() {
         Button btnCallPhone = findViewById(R.id.btnCallPhone);
