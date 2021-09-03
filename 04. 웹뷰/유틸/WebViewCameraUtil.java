@@ -18,7 +18,7 @@ import androidx.core.content.FileProvider;
  * 개정이력
  * -----------------------------------
  * 2021. 9. 01. 김대광	최초 작성
- * 2021. 9. 02. 김대광  runCameraVideo 추가 / 선택팝업 관련 수정 (불필요 라인 날림)
+ * 2021. 9. 02. 김대광  runCameraVideo 추가
  * </pre>
  *
  * <pre>
@@ -68,7 +68,7 @@ public class WebViewCameraUtil {
         intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, uriCameraImage);
 
         if (!isCapture) {
-            // 선택 팝업 : 갤러리, 포토 띄우기
+            // 선택 팝업 : 갤러리, 포토 띄우기 (이미지만)
             Intent pickIntent = new Intent(Intent.ACTION_PICK);
             pickIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
             pickIntent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -77,8 +77,8 @@ public class WebViewCameraUtil {
             Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
 
             // 선택 팝업에 카메라 포함
-            // chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[]
-            // { intentCamera });
+             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[]
+             { intentCamera });
 
             // FIXME : deprecated ...
             activity.startActivityForResult(chooserIntent, fileReqCode);
@@ -106,8 +106,24 @@ public class WebViewCameraUtil {
         }
         intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, uriCameraImage);
 
-        // FIXME : deprecated ...
-        activity.startActivityForResult(intentCamera, fileReqCode);
+        if (!isCapture) {
+            // 선택 팝업 : 갤러리, 포토 띄우기 (동영상만)
+            Intent pickIntent = new Intent(Intent.ACTION_PICK);
+            pickIntent.setType(MediaStore.Video.Media.CONTENT_TYPE);
+            pickIntent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+
+            String pickTitle = "사진 가져올 방법을 선택하세요.";
+            Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
+
+            // 선택 팝업에 카메라 포함
+            //chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] { intentCamera });
+
+            // FIXME : deprecated ...
+            activity.startActivityForResult(chooserIntent, fileReqCode);
+        } else {
+            // FIXME : deprecated ...
+            activity.startActivityForResult(intentCamera, fileReqCode);
+        }
 
         return uriCameraImage;
     }

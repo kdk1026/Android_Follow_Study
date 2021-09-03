@@ -30,6 +30,11 @@ Androd WebView 업로드 - 카메라(사진, 동영상)
                 <input type="file" name="videoFile" id="videoFile" accept="video/*" capture="camcorder" />
                 <video src="" controls="true" id="mVideo" style="width: 200px; height: 200px;"></video>
             </div>
+            <div>
+                <div>카메라 캠코더 | 내 파일 | 파일</div>
+                <input type="file" name="videoFile" id="videoFile2" accept="video/*" />
+                <video src="" controls="true" id="mVideo2" style="width: 200px; height: 200px;"></video>
+            </div>
         </div>
 
         <script>
@@ -42,13 +47,16 @@ Androd WebView 업로드 - 카메라(사진, 동영상)
                 document.querySelector('#mFile').addEventListener('change', function(e) {
                     const fileUrl = window.URL.createObjectURL(e.target.files[0]);
                     document.querySelector('#mImg2').setAttribute("src", fileUrl);
-
-                    // 웹뷰도 할려고 하면 모바일 웹이랑 동일하게 맞출 수 있을거 같기는 하지만....
                 });
 
                 document.querySelector('#videoFile').addEventListener('change', function(e) {
                     const fileUrl = window.URL.createObjectURL(e.target.files[0]);
                     document.querySelector('#mVideo').setAttribute("src", fileUrl);
+                });
+
+                document.querySelector('#videoFile2').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mVideo2').setAttribute("src", fileUrl);
                 });
             });
         </script>
