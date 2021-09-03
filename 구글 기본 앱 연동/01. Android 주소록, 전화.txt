@@ -52,7 +52,6 @@ Android 주소록, 전화
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                intent.setData(ContactsContract.Contacts.CONTENT_URI);
                 startActivityResult.launch(intent);
             }
         });
