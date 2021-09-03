@@ -130,7 +130,6 @@ Androd WebView 업로드 - 카메라, 음성 녹음
     private WebSettings webSettings;
 
     public ValueCallback<Uri[]> filePathCallbackLollipop;
-    public final static int FILECHOOSER_LOLLIPOP_REQ_CODE = 2002;
     private Uri fileUri = null;
 
     public static final int CAMERA_ENABLE_REQUEST_CODE = 1;
@@ -168,13 +167,13 @@ Androd WebView 업로드 - 카메라, 음성 녹음
 
                 switch (acceptType) {
                     case "image/*":
-                        fileUri = WebViewFileUtil.getInstance().runCameraImage( isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                        fileUri = WebViewFileUtil.getInstance().runCameraImage( isCapture, MainActivity.this, fileChooserResult );
                         break;
                     case "video/*":
-                        fileUri = WebViewFileUtil.getInstance().runCameraVideo(isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                        fileUri = WebViewFileUtil.getInstance().runCameraVideo(isCapture, MainActivity.this, fileChooserResult );
                         break;
                     case "audio/*":
-                        fileUri = WebViewFileUtil.getInstance().runMicrophone(isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE);
+                        fileUri = WebViewFileUtil.getInstance().runMicrophone(isCapture, MainActivity.this, fileChooserResult);
                         break;
                     default:
                         break;
@@ -189,36 +188,35 @@ Androd WebView 업로드 - 카메라, 음성 녹음
         webView.loadUrl("https://test-a9f7e.web.app/mobile_etc.html");
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode) {
-            case FILECHOOSER_LOLLIPOP_REQ_CODE:
-                if ( resultCode == RESULT_OK ) {
-                    if ( filePathCallbackLollipop == null ) return;
-                    if ( data == null ) {
-                        data = new Intent();
-                    }
-                    if ( data.getData() == null ) {
-                        data.setData(fileUri);
-                    }
+    ActivityResultLauncher<Intent> fileChooserResult = registerForActivityResult(
+            new  ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
 
-                    Log.d(TAG, "fileUri : " + fileUri);
+                        if ( filePathCallbackLollipop == null ) return;
+                        if ( data == null ) {
+                            data = new Intent();
+                        }
+                        if ( data.getData() == null ) {
+                            data.setData(fileUri);
+                        }
 
-                    filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
-                    filePathCallbackLollipop = null;
-                } else {
-                    if ( filePathCallbackLollipop != null ) {
-                        filePathCallbackLollipop.onReceiveValue(null);
+                        Log.d(TAG, "fileUri : " + fileUri);
+
+                        filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.getResultCode(), data));
                         filePathCallbackLollipop = null;
+                    } else {
+                        if ( filePathCallbackLollipop != null ) {
+                            filePathCallbackLollipop.onReceiveValue(null);
+                            filePathCallbackLollipop = null;
+                        }
                     }
                 }
-                break;
-            default:
-                break;
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+            }
+    );
 
     public void checkPermission(Context context) {
         FileUtil.getExternalInstance().checkPermission(getApplicationContext(), this, EXTERNAL_STORAGE_ENABLE_REQUEST_CODE);

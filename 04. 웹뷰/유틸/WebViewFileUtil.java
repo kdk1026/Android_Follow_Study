@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 
 import java.io.File;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.FileProvider;
 
 /**
@@ -19,7 +20,7 @@ import androidx.core.content.FileProvider;
  * -----------------------------------
  * 2021. 9. 01. 김대광	최초 작성
  * 2021. 9. 02. 김대광   runCameraVideo 추가
- * 2021. 9. 03. 김대광   runMicrophone 추가
+ * 2021. 9. 03. 김대광   runMicrophone 추가 / deprecated 대응
  * </pre>
  *
  * <pre>
@@ -56,10 +57,10 @@ public class WebViewFileUtil {
      * 카메라 이미지 처리
      * @param isCapture
      * @param activity
-     * @param fileReqCode
+     * @param fileChooserResult
      * @return
      */
-    public Uri runCameraImage(boolean isCapture, Activity activity, int fileReqCode) {
+    public Uri runCameraImage(boolean isCapture, Activity activity, ActivityResultLauncher<Intent> fileChooserResult) {
         Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         File path = Environment.getExternalStorageDirectory();
@@ -88,11 +89,9 @@ public class WebViewFileUtil {
              chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[]
              { intentCamera });
 
-            // FIXME : deprecated ...
-            activity.startActivityForResult(chooserIntent, fileReqCode);
+            fileChooserResult.launch(chooserIntent);
         } else {
-            // FIXME : deprecated ...
-            activity.startActivityForResult(intentCamera, fileReqCode);
+            fileChooserResult.launch(intentCamera);
         }
 
         return fileUri;
@@ -102,10 +101,10 @@ public class WebViewFileUtil {
      * 카메라 캠코더 처리
      * @param isCapture
      * @param activity
-     * @param fileReqCode
+     * @param fileChooserResult
      * @return
      */
-    public Uri runCameraVideo(boolean isCapture, Activity activity, int fileReqCode) {
+    public Uri runCameraVideo(boolean isCapture, Activity activity, ActivityResultLauncher<Intent> fileChooserResult) {
         Intent intentCamera = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
         File path = Environment.getExternalStorageDirectory();
@@ -133,11 +132,9 @@ public class WebViewFileUtil {
             // 선택 팝업에 카메라 포함
             //chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] { intentCamera });
 
-            // FIXME : deprecated ...
-            activity.startActivityForResult(chooserIntent, fileReqCode);
+            fileChooserResult.launch(chooserIntent);
         } else {
-            // FIXME : deprecated ...
-            activity.startActivityForResult(intentCamera, fileReqCode);
+            fileChooserResult.launch(intentCamera);
         }
 
         return fileUri;
@@ -147,10 +144,10 @@ public class WebViewFileUtil {
      * 음성 녹음 처리
      * @param isCapture
      * @param activity
-     * @param fileReqCode
+     * @param fileChooserResult
      * @return
      */
-    public Uri runMicrophone(boolean isCapture, Activity activity, int fileReqCode) {
+    public Uri runMicrophone(boolean isCapture, Activity activity, ActivityResultLauncher<Intent> fileChooserResult) {
         Intent intentSpeech = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
 
         File path = Environment.getExternalStorageDirectory();
@@ -178,11 +175,9 @@ public class WebViewFileUtil {
             // 선택 팝업에 음성 녹음 포함
             //chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] { intentSpeech });
 
-            // FIXME : deprecated ...
-            activity.startActivityForResult(chooserIntent, fileReqCode);
+            fileChooserResult.launch(chooserIntent);
         } else {
-            // FIXME : deprecated ...
-            activity.startActivityForResult(intentSpeech, fileReqCode);
+            fileChooserResult.launch(intentSpeech);
         }
 
         return fileUri;
