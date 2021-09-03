@@ -62,12 +62,14 @@ Android 주소록, 전화
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    Log.d(TAG, "선택한 결과 : " + result.getData().getDataString());
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Log.d(TAG, "선택한 결과 : " + result.getData().getDataString());
 
-                    // 상세보기 화면 띄우기
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(result.getData().getDataString()));
-                    startActivity(intent);
+                        // 상세보기 화면 띄우기
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(result.getData().getDataString()));
+                        startActivity(intent);
+                    }
                 }
             }
     );
