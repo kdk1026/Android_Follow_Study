@@ -131,8 +131,7 @@ public class WebViewFileUtil {
             Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
 
             // 선택 팝업에 카메라 포함
-            // chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] {
-            // intentCamera });
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] { intentCamera });
 
             fileChooserResult.launch(chooserIntent);
         } else {
@@ -176,8 +175,7 @@ public class WebViewFileUtil {
             Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
 
             // 선택 팝업에 음성 녹음 포함
-            // chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] {
-            // intentSpeech });
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] { intentSpeech });
 
             fileChooserResult.launch(chooserIntent);
         } else {
