@@ -4,10 +4,6 @@ Android 카메라
 
 	* src/main/AndroidManifest.xml
 	-----------------------------------------------------------------
-    <!--
-        기본 실습 시에는 필요 없음
-        추후 추가 실습 시에 필요할 수 있으므로
-    -->
     <uses-permission android:name="android.permission.CAMERA" />
 	-----------------------------------------------------------------
 
@@ -53,8 +49,7 @@ Android 카메라
 
     private static final String TAG = "***MainActivity";
 
-    private static final int MEDIA_TYPE_IMAGE = 30;
-    private static final int MEDIA_TYPE_VIDEO = 20;
+    private static final int CAMERA_ENABLE_REQUEST_CODE = 1;
 
     private ImageView imageView;
     private VideoView videoView;
@@ -63,6 +58,8 @@ Android 카메라
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.checkPermission( getApplicationContext() );
 
         /*
             - 일단 기본만 실습
@@ -86,57 +83,23 @@ Android 카메라
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, MEDIA_TYPE_IMAGE);
-
-                /*
-                    // https://www.codingdemos.com/android-onactivityresult-is-deprecated-now-what/
-
-                    // TODO : deprecated 되었건만... 어쩔 수가 없다... 아오!! 힘들게 찾았드만 에러가 아주!!!
-
-                    [오류내용]
-                    LifecycleOwner com.example.testapp.MainActivity@ce40734 is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED
-                 */
-//                ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
-//                    new  ActivityResultContracts.StartActivityForResult(),
-//                    new ActivityResultCallback<ActivityResult>() {
-//                        @Override
-//                        public void onActivityResult(ActivityResult result) {
-//                            Log.d(TAG, "onActivityResult : " + result.getResultCode());
-//                            Log.d(TAG, "onActivityResult : " + result.getData());
-//
-//                            if ( result.getResultCode() == RESULT_OK && result.getData() != null ) {
-//                                Bundle bundle = result.getData().getExtras();
-//                                Bitmap bitmap = (Bitmap) bundle.get("data");
-//                                imageView.setImageBitmap(bitmap);
-//                            }
-//                        }
-//                });
-//                startActivityResult.launch(intent);
+                cameraImageResult.launch(intent);
             }
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if ( resultCode == RESULT_OK ) {
-            if ( requestCode == MEDIA_TYPE_IMAGE ) {
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                imageView.setImageBitmap(bitmap);
+    ActivityResultLauncher<Intent> cameraImageResult = registerForActivityResult(
+            new  ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Bitmap bitmap = (Bitmap) result.getData().getExtras().get("data");
+                        imageView.setImageBitmap(bitmap);
+                    }
+                }
             }
-
-            if ( requestCode == MEDIA_TYPE_VIDEO ) {
-                Log.d(TAG, "onActivityResult : " + data.getData());
-                videoView.setVideoURI(Uri.parse(data.getDataString()) );
-
-                final MediaController mediaController = new MediaController(MainActivity.this);
-                videoView.setMediaController(mediaController);
-
-                videoView.start();
-            }
-        }
-    }
+    );
 
     private void processVideo() {
         videoView = findViewById(R.id.videoView);
@@ -149,10 +112,56 @@ Android 카메라
                 intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
                 intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 20);
                 intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 1024 * 1024 * 10);
-                startActivityForResult(intent, MEDIA_TYPE_VIDEO);
-                
-                // TODO : processImage 의 TODO 와 상동
+                cameraVideoResult.launch(intent);
             }
         });
+    }
+
+    ActivityResultLauncher<Intent> cameraVideoResult = registerForActivityResult(
+            new  ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Log.d(TAG, "onActivityResult : " + result.getData().getData());
+                        videoView.setVideoURI(Uri.parse(result.getData().getDataString()) );
+
+                        final MediaController mediaController = new MediaController(MainActivity.this);
+                        videoView.setMediaController(mediaController);
+
+                        videoView.start();
+                    }
+                }
+            }
+    );
+
+    public void checkPermission(Context context) {
+        if ( ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ) {
+
+            String[] permissions = { Manifest.permission.CAMERA };
+            ActivityCompat.requestPermissions(this, permissions, CAMERA_ENABLE_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if ( requestCode == CAMERA_ENABLE_REQUEST_CODE ) {
+            if ( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(), "앱 실행을 위한 카메라 권한이 설정 되었습니다.", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "앱 실행을 위한 카메라 권한이 취소 되었습니다.", Toast.LENGTH_LONG).show();
+
+                try {
+                    Thread.sleep(2000);
+
+                    FinishRestartUtil.getInstance().completelyExit( this, getApplicationContext() );
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
     -----------------------------------------------------------------
