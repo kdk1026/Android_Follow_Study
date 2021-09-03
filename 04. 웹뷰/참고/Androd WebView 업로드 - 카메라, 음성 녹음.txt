@@ -117,9 +117,9 @@ Androd WebView 업로드 - 카메라, 음성 녹음
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 	-----------------------------------------------------------------
 
-    * src/main/java/com/example/mytest/util/WebViewCameraUtil.java
+    * src/main/java/com/example/mytest/util/WebViewFileUtil.java
     -----------------------------------------------------------------
-    04. 웹뷰/유틸/WebViewCameraUtil.java
+    04. 웹뷰/유틸/WebViewFileUtil.java
     -----------------------------------------------------------------
 
     * src/main/java/com/example/mytest/MainActivity.java
