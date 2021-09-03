@@ -18,28 +18,29 @@ import androidx.core.content.FileProvider;
  * 개정이력
  * -----------------------------------
  * 2021. 9. 01. 김대광	최초 작성
- * 2021. 9. 02. 김대광  runCameraVideo 추가
+ * 2021. 9. 02. 김대광   runCameraVideo 추가
+ * 2021. 9. 03. 김대광   runMicrophone 추가
  * </pre>
  *
  * <pre>
- * 앱 정보 가져오기 유틸
+ * 웹뷰 파일 처리 유틸
  * </pre>
  *
  * @author 김대광
  * @Description : minSdkVersion 26 / targetSdkVersion 30
  */
-public class WebViewCameraUtil {
+public class WebViewFileUtil {
 
     private static final String TAG = "AppInfoUtil";
 
-    private WebViewCameraUtil() {
+    private WebViewFileUtil() {
     }
 
     private static class LazyHolder {
-        private static final WebViewCameraUtil INSTANCE = new WebViewCameraUtil();
+        private static final WebViewFileUtil INSTANCE = new WebViewFileUtil();
     }
 
-    public static WebViewCameraUtil getInstance() {
+    public static WebViewFileUtil getInstance() {
         return LazyHolder.INSTANCE;
     }
 
@@ -49,8 +50,15 @@ public class WebViewCameraUtil {
         this.context = context;
     }
 
-    private Uri uriCameraImage = null;
+    private Uri fileUri = null;
 
+    /**
+     * 카메라 이미지 처리
+     * @param isCapture
+     * @param activity
+     * @param fileReqCode
+     * @return
+     */
     public Uri runCameraImage(boolean isCapture, Activity activity, int fileReqCode) {
         Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -61,11 +69,11 @@ public class WebViewCameraUtil {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String providerAuthorities = this.context.getPackageName() + ".provider";
 
-            uriCameraImage = FileProvider.getUriForFile(this.context, providerAuthorities, file);
+            fileUri = FileProvider.getUriForFile(this.context, providerAuthorities, file);
         } else {
-            uriCameraImage = Uri.fromFile(file);
+            fileUri = Uri.fromFile(file);
         }
-        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, uriCameraImage);
+        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
         if (!isCapture) {
             // 선택 팝업 : 갤러리, 포토 띄우기 (이미지만)
@@ -87,9 +95,16 @@ public class WebViewCameraUtil {
             activity.startActivityForResult(intentCamera, fileReqCode);
         }
 
-        return uriCameraImage;
+        return fileUri;
     }
 
+    /**
+     * 카메라 캠코더 처리
+     * @param isCapture
+     * @param activity
+     * @param fileReqCode
+     * @return
+     */
     public Uri runCameraVideo(boolean isCapture, Activity activity, int fileReqCode) {
         Intent intentCamera = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
@@ -100,11 +115,11 @@ public class WebViewCameraUtil {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String providerAuthorities = this.context.getPackageName() + ".provider";
 
-            uriCameraImage = FileProvider.getUriForFile(this.context, providerAuthorities, file);
+            fileUri = FileProvider.getUriForFile(this.context, providerAuthorities, file);
         } else {
-            uriCameraImage = Uri.fromFile(file);
+            fileUri = Uri.fromFile(file);
         }
-        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, uriCameraImage);
+        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
         if (!isCapture) {
             // 선택 팝업 : 갤러리, 포토 띄우기 (동영상만)
@@ -112,7 +127,7 @@ public class WebViewCameraUtil {
             pickIntent.setType(MediaStore.Video.Media.CONTENT_TYPE);
             pickIntent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
 
-            String pickTitle = "사진 가져올 방법을 선택하세요.";
+            String pickTitle = "동영상 가져올 방법을 선택하세요.";
             Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
 
             // 선택 팝업에 카메라 포함
@@ -125,7 +140,52 @@ public class WebViewCameraUtil {
             activity.startActivityForResult(intentCamera, fileReqCode);
         }
 
-        return uriCameraImage;
+        return fileUri;
+    }
+
+    /**
+     * 음성 녹음 처리
+     * @param isCapture
+     * @param activity
+     * @param fileReqCode
+     * @return
+     */
+    public Uri runMicrophone(boolean isCapture, Activity activity, int fileReqCode) {
+        Intent intentSpeech = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+
+        File path = Environment.getExternalStorageDirectory();
+        File file = new File(path, "sample.m4a");
+
+        // File 객체의 URI를 얻는다.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String providerAuthorities = this.context.getPackageName() + ".provider";
+
+            fileUri = FileProvider.getUriForFile(this.context.getApplicationContext(), providerAuthorities, file);
+        } else {
+            fileUri = Uri.fromFile(file);
+        }
+        intentSpeech.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+        if (!isCapture) {
+            // 선택 팝업 : 사운드 선택기
+            Intent pickIntent = new Intent(Intent.ACTION_PICK);
+            pickIntent.setType(MediaStore.Audio.Media.CONTENT_TYPE);
+            pickIntent.setData(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+
+            String pickTitle = "사운드 가져올 방법을 선택하세요.";
+            Intent chooserIntent = Intent.createChooser(pickIntent, pickTitle);
+
+            // 선택 팝업에 음성 녹음 포함
+            //chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[] { intentSpeech });
+
+            // FIXME : deprecated ...
+            activity.startActivityForResult(chooserIntent, fileReqCode);
+        } else {
+            // FIXME : deprecated ...
+            activity.startActivityForResult(intentSpeech, fileReqCode);
+        }
+
+        return fileUri;
     }
 
 }

@@ -1,5 +1,5 @@
-Android WevView 업로드 - 음성 녹음
---------------------------------
+Androd WebView 업로드 - 카메라, 음성 녹음
+------------------------------------------
     - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
 
 << HTML >>
@@ -16,17 +16,67 @@ Android WevView 업로드 - 음성 녹음
 
         <div>
             <div>
-                <div>오디오</div>
+                <div>카메라 (사진)</div>
+                <input type="file" name="imgFile" id="imgFile" accept="image/*" capture="camera" />
+                <img src="https://placeimg.com/200/200/any" alt="테스트 이미지" id="mImg" style="width: 200px; height: 200px;" />
+            </div>
+            <div>
+                <div>카메라 | 내 파일 | 파일</div>
+                <input type="file" name="mFile" id="mFile" accept="image/*" />
+                <img src="https://placeimg.com/200/200/any" alt="테스트 이미지" id="mImg2" style="width: 200px; height: 200px;" />
+            </div>
+            <div>
+                <div>카메라 (동영상)</div>
+                <input type="file" name="videoFile" id="videoFile" accept="video/*" capture="camcorder" />
+                <video src="" controls="true" id="mVideo" style="width: 200px; height: 200px;"></video>
+            </div>
+            <div>
+                <div>카메라 캠코더 | 내 파일 | 파일</div>
+                <input type="file" name="videoFile" id="videoFile2" accept="video/*" />
+                <video src="" controls="true" id="mVideo2" style="width: 200px; height: 200px;"></video>
+            </div>
+            <div>
+                <div>음성 녹음</div>
                 <input type="file" name="audioFile" id="audioFile" accept="audio/*" capture="microphone" />
                 <audio src="" controls="true" id="mAudio"></audio>
+            </div>
+            <div>
+                <div>음성 녹음 | 내 파일 | 파일</div>
+                <input type="file" name="audioFile" id="audioFile2" accept="audio/*" />
+                <audio src="" controls="true" id="mAudio2"></audio>
             </div>
         </div>
 
         <script>
             window.addEventListener('load', function(){
+                document.querySelector('#imgFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mImg').setAttribute("src", fileUrl);
+                });
+
+                document.querySelector('#mFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mImg2').setAttribute("src", fileUrl);
+                });
+
+                document.querySelector('#videoFile').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mVideo').setAttribute("src", fileUrl);
+                });
+
+                document.querySelector('#videoFile2').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mVideo2').setAttribute("src", fileUrl);
+                });
+
                 document.querySelector('#audioFile').addEventListener('change', function(e) {
                     const fileUrl = window.URL.createObjectURL(e.target.files[0]);
                     document.querySelector('#mAudio').setAttribute("src", fileUrl);
+                });
+
+                document.querySelector('#audioFile2').addEventListener('change', function(e) {
+                    const fileUrl = window.URL.createObjectURL(e.target.files[0]);
+                    document.querySelector('#mAudio2').setAttribute("src", fileUrl);
                 });
             });
         </script>
@@ -59,6 +109,7 @@ Android WevView 업로드 - 음성 녹음
         </provider>
     </application>
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -80,7 +131,7 @@ Android WevView 업로드 - 음성 녹음
 
     public ValueCallback<Uri[]> filePathCallbackLollipop;
     public final static int FILECHOOSER_LOLLIPOP_REQ_CODE = 2002;
-    private Uri audioImageUri = null;
+    private Uri fileUri = null;
 
     public static final int CAMERA_ENABLE_REQUEST_CODE = 1;
     public static final int EXTERNAL_STORAGE_ENABLE_REQUEST_CODE = 2;
@@ -113,25 +164,17 @@ Android WevView 업로드 - 음성 녹음
                 Log.d(TAG, "fileChooserParams - acceptType : " + acceptType);
                 Log.d(TAG, "fileChooserParams - isCapture : " + isCapture);
 
+                WebViewFileUtil.getInstance().setContext( getApplicationContext() );
+
                 switch (acceptType) {
+                    case "image/*":
+                        fileUri = WebViewFileUtil.getInstance().runCameraImage( isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                        break;
+                    case "video/*":
+                        fileUri = WebViewFileUtil.getInstance().runCameraVideo(isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE );
+                        break;
                     case "audio/*":
-                        Intent intentSpeech = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-
-                        File path = Environment.getExternalStorageDirectory();
-                        File file = new File(path, "sample.m4a");
-
-                        // File 객체의 URI를 얻는다.
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            String providerAuthorities = getApplication().getPackageName() + ".provider";
-
-                            audioImageUri = FileProvider.getUriForFile(getApplicationContext(), providerAuthorities, file);
-                        } else {
-                            audioImageUri = Uri.fromFile(file);
-                        }
-                        intentSpeech.putExtra(MediaStore.EXTRA_OUTPUT, audioImageUri);
-
-                        // FIXME : deprecated ...
-                        startActivityForResult(intentSpeech, FILECHOOSER_LOLLIPOP_REQ_CODE);
+                        fileUri = WebViewFileUtil.getInstance().runMicrophone(isCapture, MainActivity.this, FILECHOOSER_LOLLIPOP_REQ_CODE);
                         break;
                     default:
                         break;
@@ -156,10 +199,10 @@ Android WevView 업로드 - 음성 녹음
                         data = new Intent();
                     }
                     if ( data.getData() == null ) {
-                        data.setData(audioImageUri);
+                        data.setData(fileUri);
                     }
 
-                    Log.d(TAG, "audioImageUri : " + audioImageUri);
+                    Log.d(TAG, "fileUri : " + fileUri);
 
                     filePathCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                     filePathCallbackLollipop = null;
@@ -178,9 +221,13 @@ Android WevView 업로드 - 음성 녹음
     }
 
     public void checkPermission(Context context) {
-        // 저장공간/유틸/FileUtil.java
-        
         FileUtil.getExternalInstance().checkPermission(getApplicationContext(), this, EXTERNAL_STORAGE_ENABLE_REQUEST_CODE);
+
+        if ( ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ) {
+
+            String[] permissions = { Manifest.permission.CAMERA };
+            ActivityCompat.requestPermissions(this, permissions, CAMERA_ENABLE_REQUEST_CODE);
+        }
     }
 
     @Override
@@ -203,6 +250,23 @@ Android WevView 업로드 - 음성 녹음
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+        }
+
+        if ( requestCode == CAMERA_ENABLE_REQUEST_CODE ) {
+            if ( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(), "앱 실행을 위한 카메라 권한이 설정 되었습니다.", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "앱 실행을 위한 카메라 권한이 취소 되었습니다.", Toast.LENGTH_LONG).show();
+
+                try {
+                    Thread.sleep(2000);
+
+                    FinishRestartUtil.getInstance().completelyExit( this, getApplicationContext() );
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
