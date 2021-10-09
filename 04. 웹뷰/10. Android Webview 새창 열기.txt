@@ -1,0 +1,64 @@
+10. Android Webview 새창 열기
+--------------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
+
+    - 액티비티가 아닌 브라우저 새창으로 열림
+
+<< HTML >>
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        
+        <a href="http://www.naver.com" target="_blank" rel="noopener noreferrer">네이버 새창</a>
+
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                // 사용자가 웹뷰에서 클릭한 정보를 획득
+                WebView.HitTestResult result = view.getHitTestResult();
+
+                // url 획득
+                String data = result.getExtra();
+
+                // url을 open
+                Context context = view.getContext();
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(data));
+                context.startActivity(browserIntent);
+                return false;
+            }
+        });
+
+        webView.setWebViewClient(new WebViewClient());
+
+        webView.loadUrl("https://test-a9f7e.web.app/blank.html");
+    }
+    -----------------------------------------------------------------
