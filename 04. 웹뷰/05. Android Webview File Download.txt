@@ -41,6 +41,11 @@
             Log.d(TAG, "onDownloadStart()- contentDisposition : " + contentDisposition);
             Log.d(TAG, "onDownloadStart()- mimetype : " + mimetype);
 
+            if (url.startsWith("data:")) {
+                createAndSaveFileFromBase64Url(url);
+                return;
+            }
+
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             try {
                 contentDisposition = URLDecoder.decode(contentDisposition, StandardCharsets.UTF_8.toString());
@@ -65,6 +70,34 @@
             downloadManager.enqueue(request);
 
             Toast.makeText(getApplicationContext(), "파일을 다운로드합니다.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void createAndSaveFileFromBase64Url(String url) {
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        String filetype = url.substring(url.indexOf("/") + 1, url.indexOf(";"));
+        String filename = System.currentTimeMillis() + "." + filetype;
+        File file = new File(path, filename);
+
+        try {
+            if ( !path.exists() ) {
+                path.mkdirs();
+            }
+
+            if( !file.exists() ) {
+                file.createNewFile();
+            }
+
+            String base64EncodedString = url.substring(url.indexOf(",") + 1);
+            byte[] decodedBytes = Base64.decode(base64EncodedString, Base64.DEFAULT);
+            OutputStream os = new FileOutputStream(file);
+            os.write(decodedBytes);
+            os.close();
+
+            Toast.makeText(getApplicationContext(), "파일을 다운로드합니다.", Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            Log.w("ExternalStorage", "Error writing " + file, e);
         }
     }
     -----------------------------------------------------------------
