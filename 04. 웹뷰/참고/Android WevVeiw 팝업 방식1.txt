@@ -1,6 +1,7 @@
 Android WevVeiw 팝업 방식1
 -----------------------------
     - https://onedaycodeing.tistory.com/62
+    - Activity 전환같은 자연스러운 방식
 
     - minSdkVersion 26 / targetSdkVersion 30
 
@@ -90,7 +91,7 @@ Android WevVeiw 팝업 방식1
             }
         });
 
-        webView.loadUrl("http://in4in.com/kdk/a.html");
+        webView.loadUrl("https://test-a9f7e.web.app/popup.html");
 
         /*
             ERR_CLEARTEXT_NOT_PERMITTED 오류

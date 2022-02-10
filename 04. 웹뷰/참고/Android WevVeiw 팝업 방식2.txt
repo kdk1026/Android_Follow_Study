@@ -1,6 +1,7 @@
 Android WevVeiw 팝업 방식2
 -----------------------------
     - https://wonpaper.tistory.com/412
+    - 다이얼로그로 띄우는 부자연스러운 방식
 
     - minSdkVersion 26 / targetSdkVersion 30
 
@@ -91,7 +92,7 @@ Android WevVeiw 팝업 방식2
             }
         });
 
-        webView.loadUrl("http://in4in.com/kdk/a.html");
+        webView.loadUrl("https://test-a9f7e.web.app/popup.html");
 
         /*
             ERR_CLEARTEXT_NOT_PERMITTED 오류
