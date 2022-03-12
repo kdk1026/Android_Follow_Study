@@ -1,0 +1,72 @@
+11. 11. Android Webview 링크 열기
+--------------------------------------
+    - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
+
+    - 기본적으로 링크는 브라우저로 열림
+
+<< HTML >>
+    -----------------------------------------------------------------
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+
+        <a href="http://www.naver.com">네이버</a>
+        
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
+	* /res/layout/activity_main.xml
+	-----------------------------------------------------------------
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+	-----------------------------------------------------------------
+
+	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private static final String TAG = "***MainActivity";
+
+    private WebView webView;
+    private WebSettings webSettings;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+        });
+
+        WebViewSettingUtil.setSettingTotal(webSettings);
+
+        webView.loadUrl("https://test-a9f7e.web.app/link.html");
+    }
+    -----------------------------------------------------------------
