@@ -3,6 +3,7 @@
     - minSdkVersion 26 / targetSdkVersion 30 / compileSdkVersion 30
 
     - 기본적으로 링크는 브라우저로 열림
+    - 또한 뒤로가기 처리도 해주어야 함
 
 << HTML >>
     -----------------------------------------------------------------
@@ -68,5 +69,14 @@
         WebViewSettingUtil.setSettingTotal(webSettings);
 
         webView.loadUrl("https://test-a9f7e.web.app/link.html");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if ( webView.canGoBack() ) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
     -----------------------------------------------------------------
