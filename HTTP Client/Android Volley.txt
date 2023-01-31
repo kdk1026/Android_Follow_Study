@@ -1,0 +1,168 @@
+Android Volley
+---------------
+
+    * 서버단 Spring Controller
+    -----------------------------------------------------------------
+    @RestController
+    public class LoginController {
+
+        @PostMapping("login")
+        public Map<String, Object> login(String id, String pw) {
+            Map<String, Object> retMap = new HashMap<>();
+            
+            if ( !StringUtils.hasLength(id) ) {
+                retMap.put("code", "400");
+                retMap.put("msg", "아이디는 필수 항목입니다.");
+                return retMap;
+            }
+            
+            if ( !StringUtils.hasLength(pw) ) {
+                retMap.put("code", "400");
+                retMap.put("msg", "비밀번호는 필수 항목입니다.");
+                return retMap;
+            }
+            
+            if ( !"test".equals(id) || !"1234".equals(pw) ) {
+                retMap.put("code", "400");
+                retMap.put("msg", "아이디 또는 비밀번호를 확인해주세요.");
+                return retMap;			
+            }
+            
+            if ( "test".equals(id) && "1234".equals(pw) ) {
+                retMap.put("code", "200");
+                retMap.put("msg", "성공");
+                return retMap;			
+            }
+            
+            return retMap;
+        }
+        
+    }
+    -----------------------------------------------------------------
+
+    * 라이브러리
+    -------------
+        > http://www.mvnrepository.com/
+            >> volley 검색
+            
+            ===========================
+            Volley
+            ===========================
+
+    * build.gradle
+    -----------------------------------------------------------------
+    // https://mvnrepository.com/artifact/com.android.volley/volley
+    implementation 'com.android.volley:volley:1.2.1'
+    -----------------------------------------------------------------
+
+	* src/main/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.INTERNET" />
+	-----------------------------------------------------------------
+
+    * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <EditText
+        android:id="@+id/edtId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:hint="ID 입력" />
+
+    <EditText
+        android:id="@+id/edtPw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:hint="PW 입력"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:text="전송"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/MainActivity.java
+    -----------------------------------------------------------------
+    public class MainActivity extends AppCompatActivity {
+
+        private static final String TAG = "***MainActivity";
+
+        private RequestQueue queue;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+
+            EditText edtId = findViewById(R.id.edtId);
+            EditText edtPw = findViewById(R.id.edtPw);
+            Button btnSend = findViewById(R.id.btnSend);
+
+            queue = Volley.newRequestQueue(this);
+            String url = "http://192.168.0.17:8080/login";
+
+            final StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jObj = new JSONObject(response);
+
+                        Toast.makeText(getApplicationContext(), jObj.getString("msg"), Toast.LENGTH_LONG).show();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("id", edtId.getText().toString());
+                    params.put("pw", edtPw.getText().toString());
+                    return params;
+                }
+
+                @Override
+                protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                    try {
+                        String utf8String = new String(response.data, StandardCharsets.UTF_8.toString());
+                        return Response.success(utf8String, HttpHeaderParser.parseCacheHeaders(response));
+
+                    } catch (UnsupportedEncodingException e) {
+                        return Response.error(new ParseError(e));
+                    }
+                }
+            };
+
+            stringRequest.setTag(TAG);
+
+            btnSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    queue.add(stringRequest);
+                }
+            });
+        }
+
+        @Override
+        protected void onStop() {
+            super.onStop();
+            if (queue != null) {
+                queue.cancelAll(TAG);
+            }
+        }
+    }
+    -----------------------------------------------------------------
