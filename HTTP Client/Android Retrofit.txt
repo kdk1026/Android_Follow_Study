@@ -1,0 +1,181 @@
+Android Retrofit
+-----------------
+    - 가장 많이 사용하는 Http Client 라이브러리    
+    - 사용법 참고 : https://jaejong.tistory.com/38
+
+    * 서버단 Spring Controller
+    -----------------------------------------------------------------
+    @RestController
+    public class LoginController {
+
+        @PostMapping("login")
+        public Map<String, Object> login(String id, String pw) {
+            Map<String, Object> retMap = new HashMap<>();
+            
+            if ( !StringUtils.hasLength(id) ) {
+                retMap.put("code", "400");
+                retMap.put("msg", "아이디는 필수 항목입니다.");
+                return retMap;
+            }
+            
+            if ( !StringUtils.hasLength(pw) ) {
+                retMap.put("code", "400");
+                retMap.put("msg", "비밀번호는 필수 항목입니다.");
+                return retMap;
+            }
+            
+            if ( !"test".equals(id) || !"1234".equals(pw) ) {
+                retMap.put("code", "400");
+                retMap.put("msg", "아이디 또는 비밀번호를 확인해주세요.");
+                return retMap;			
+            }
+            
+            if ( "test".equals(id) && "1234".equals(pw) ) {
+                retMap.put("code", "200");
+                retMap.put("msg", "성공");
+                return retMap;			
+            }
+            
+            return retMap;
+        }
+        
+    }
+    -----------------------------------------------------------------
+
+    * 라이브러리
+    -------------
+        > http://www.mvnrepository.com/
+            >> retrofit 검색
+            
+            ===========================
+            Converter: Gson
+            ===========================
+
+    * build.gradle
+    -----------------------------------------------------------------
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    -----------------------------------------------------------------
+
+	* src/main/AndroidManifest.xml
+	-----------------------------------------------------------------
+    <uses-permission android:name="android.permission.INTERNET" />
+	-----------------------------------------------------------------
+
+    * src/main/res/layout/activity_main.xml
+    -----------------------------------------------------------------
+    <EditText
+        android:id="@+id/edtId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:hint="ID 입력" />
+
+    <EditText
+        android:id="@+id/edtPw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:hint="PW 입력"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:text="전송"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/api/LoginResult.java
+    -----------------------------------------------------------------
+    public class LoginResult {
+
+        @SerializedName("code")
+        private String code;
+
+        @SerializedName("msg")
+        private String msg;
+
+        Getter/Setter
+    }
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/api/LoginApi.java
+    -----------------------------------------------------------------
+    public interface LoginApi {
+
+        @FormUrlEncoded
+        @POST("login")
+        Call<LoginResult> login(@FieldMap Map<String, String> fieldMap);
+    }
+    -----------------------------------------------------------------
+
+    * src/main/java/com/example/mytest/MainActivity.java
+    -----------------------------------------------------------------
+    public class MainActivity extends AppCompatActivity {
+
+        private static final String TAG = "***MainActivity";
+
+        private final String BASE_URL = "http://192.168.0.17:8080/";
+        private LoginApi loginApi;
+
+        private EditText edtId;
+        private EditText edtPw;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+
+            edtId = findViewById(R.id.edtId);
+            edtPw = findViewById(R.id.edtPw);
+            Button btnSend = findViewById(R.id.btnSend);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(this.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            btnSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    loginApi = retrofit.create(LoginApi.class);
+
+                    login();
+                }
+            });
+        }
+
+        private void login() {
+            Map<String, String> params = new HashMap<>();
+            params.put("id", edtId.getText().toString());
+            params.put("pw", edtPw.getText().toString());
+
+            Call<LoginResult> call = loginApi.login(params);
+
+            call.enqueue(new Callback<LoginResult>() {
+                @Override
+                public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                    if ( !response.isSuccessful() ) {
+                        Toast.makeText(getApplicationContext(), response.code(), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    LoginResult loginResult = response.body();
+
+                    Toast.makeText(getApplicationContext(), loginResult.getMsg(), Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(Call<LoginResult> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+    -----------------------------------------------------------------
