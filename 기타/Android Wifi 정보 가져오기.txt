@@ -1,0 +1,139 @@
+Android Wifi 정보 가져오기
+--------------------------
+    - minSdkVersion 26 / targetSdkVersion 30
+
+* src/main/AndroidManifest.xml
+-----------------------------------------------------------------
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+-----------------------------------------------------------------
+
+* src/main/res/layout/activity_main.xml
+-----------------------------------------------------------------
+<TextView
+    android:id="@+id/textView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="TextView"
+    app:layout_constraintBottom_toTopOf="@+id/textView2"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.154" />
+
+<TextView
+    android:id="@+id/textView2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="TextView"
+    app:layout_constraintBottom_toTopOf="@+id/textView3"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/textView"
+    app:layout_constraintVertical_bias="0.181" />
+
+<TextView
+    android:id="@+id/textView3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="TextView"
+    app:layout_constraintBottom_toTopOf="@+id/textView4"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/textView2"
+    app:layout_constraintVertical_bias="0.207" />
+
+<TextView
+    android:id="@+id/textView4"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="TextView"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/textView3"
+    app:layout_constraintVertical_bias="0.741" />
+-----------------------------------------------------------------
+
+* com/example/mytest/MainActivity.java
+-----------------------------------------------------------------
+private static final String TAG = "***MainActivity";
+
+private TextView textView;
+private TextView textView2;
+private TextView textView3;
+private TextView textView4;
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    textView = findViewById(R.id.textView);
+    textView2 = findViewById(R.id.textView2);
+    textView3 = findViewById(R.id.textView3);
+    textView4 = findViewById(R.id.textView4);
+
+    this.checkPermission(super.getApplicationContext());
+
+    WifiManager wifiManager = (WifiManager) super.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+    int level = WifiManager.calculateSignalLevel(wifiInfo.getRssi(), 5);
+    textView.setText("와이파이 신호 강도 : " + level);
+
+    if (wifiManager.isWifiEnabled()) {
+        String ssid = wifiInfo.getSSID();
+        textView2.setText("SSID : " + ssid);
+
+        int ipAddress = wifiInfo.getIpAddress();
+        String ipString = String.format("%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        textView3.setText("IP : " + ipString);
+    }
+
+    String macAddress = wifiInfo.getMacAddress();
+    textView4.setText("Mac : " + macAddress);
+}
+
+public void checkPermission(Context context) {
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        Log.d(TAG, "checkSelfPermission");
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+            Log.d(TAG, "shouldShowRequestPermissionRationale");
+        } else {
+            Log.d(TAG, "권한 요청");
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_WIFI_STATE,
+                            Manifest.permission.CHANGE_WIFI_STATE
+                    }, 1000);
+        }
+    }
+}
+
+@Override
+public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    
+    switch (requestCode) {
+        case 1000: {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "권한 획득 성공");
+            } else {
+                Log.d(TAG, "권한 획득 실패");
+            }
+            break;
+        }
+    }
+}
+-----------------------------------------------------------------
