@@ -7,6 +7,9 @@
 << Spring >>
     * /FileTest/src/main/resources/application.properties
     -----------------------------------------------------------------
+    spring.servlet.multipart.max-file-size=10MB
+    spring.servlet.multipart.max-request-size=10MB
+
     upload.folder=file:/D:/upload/
     -----------------------------------------------------------------
 
