@@ -1,0 +1,139 @@
+04_1. Android Webview File Upload(전체)
+----------------------------------------
+    - html <input type="file">은 네이티브 쪽에서 아무 처리도 해주지 않으면, 아무런 반응도 일어나지 않음
+
+    - minSdkVersion 26 / targetSdkVersion 30
+
+<< Spring >>
+    * /FileTest/src/main/resources/application.properties
+    -----------------------------------------------------------------
+    upload.folder=file:/D:/upload/
+    -----------------------------------------------------------------
+
+    * com.example.demo.FileController
+    -----------------------------------------------------------------
+    @Controller
+    @RequestMapping("/file")
+    public class FileController {
+
+        @Value("${upload.folder}")
+        private String uploadFolder;
+
+        @GetMapping("/upload")
+        public ModelAndView upload() {
+            ModelAndView mav = new ModelAndView();
+
+            mav.setViewName("file/upload");
+            return mav;
+        }
+
+        @PostMapping("/upload")
+        public void fileUpload(@RequestPart("mFile") MultipartFile file) throws IOException {
+            // 로컬용
+            String sUploadPath = uploadFolder.replace("file:/", "");
+
+            String sFileName = file.getOriginalFilename();
+            String sFileExt = "";
+
+            if ( sFileName.lastIndexOf(".") > -1 ) {
+                int nPosition = sFileName.lastIndexOf(".");
+                sFileExt = sFileName.substring(nPosition);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(UUID.randomUUID().toString().replaceAll("-", ""));
+            sb.append(sFileExt);
+
+            String sSaveFileName = sb.toString();
+
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(sUploadPath + sSaveFileName);
+            Files.write(path, bytes);
+        }
+
+    }
+    -----------------------------------------------------------------
+
+    * /FileTest/src/main/webapp/WEB-INF/jsp/file/upload.jsp
+    -----------------------------------------------------------------
+    <%@ page language="java" contentType="text/html; charset=UTF-8"
+        pageEncoding="UTF-8"%>
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert title here</title>
+    </head>
+    <body>
+
+        <div>
+            <form action="/file/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="mFile" />
+                <button type="submit">전송</button>
+            </form>
+        </div>
+
+    </body>
+    </html>
+    -----------------------------------------------------------------
+
+<< Android >>
+ 	* /java/패키지 경로/MainActivity
+	-----------------------------------------------------------------
+    private WebView webView;
+    private WebSettings webSettings;
+
+    public static final int FILE_SELECTOR_REQ = 1;
+    private ValueCallback mFilePathCallback;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = findViewById(R.id.webView);
+        webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback filePathCallback, FileChooserParams fileChooserParams) {
+                mFilePathCallback = filePathCallback;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+
+                // TODO registerForActivityResult
+                startActivityForResult(Intent.createChooser(intent,"Select File"), FILE_SELECTOR_REQ);
+                return true;
+            }
+        });
+
+        webView.loadUrl("http://192.168.0.17:8080/file/upload");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FILE_SELECTOR_REQ) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mFilePathCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                } else {
+                    mFilePathCallback.onReceiveValue(new Uri[]{data.getData()});
+                }
+                mFilePathCallback = null;
+            } else {
+                // 취소 했을 경우
+                if (mFilePathCallback != null) {
+                    mFilePathCallback.onReceiveValue(null);
+                    mFilePathCallback = null;
+                }
+            }
+        }
+    }
+    -----------------------------------------------------------------
